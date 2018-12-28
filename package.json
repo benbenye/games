@@ -5,8 +5,8 @@
   "scripts": {
     "commit": "git-cz",
     "release": "standard-version",
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "serve": "tools/vcs.js serve",
+    "build": "tools/vcs.js build",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit -r should -r should-sinon"
   },
@@ -31,6 +31,7 @@
     "eslint-config-prettier": "^3.1.0",
     "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-vue": "^5.0.0-0",
+    "inquirer": "^6.2.1",
     "lint-staged": "^8.0.4",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",

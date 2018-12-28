@@ -1,34 +1,42 @@
 # multiple-site-seed
 
 ## Project setup
-```
+```bash
 npm install
 ```
 
 ### Compiles and hot-reloads for development
-```
-npm run serve -- src/sites/site-a/main.js                  
-
+```bash
+npm run serve -- site-a                  
+# or just
+npm run serve                  
 ```
 
 ### Compiles and minifies for production
-```
-npm run build -- --dest dist/site-a src/sites/site-a/main.js
+```bash
+npm run build -- site-a
+# or just
+npm run build
 ```
 
 ### Run your tests
-```
+```bash
 npm run test
 ```
 
 ### Lints and fixes files
-```
+```bash
 npm run lint
 ```
 
 ### Run your unit tests
-```
+```bash
 npm run test:unit
+```
+
+### Commit your code
+```bash
+npm run commit
 ```
 
 ### Customize configuration
