@@ -1,0 +1,62 @@
+{
+  "name": "multiple-site-seed",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "commit": "git-cz",
+    "release": "standard-version",
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "test:unit": "vue-cli-service test:unit -r should -r should-sinon"
+  },
+  "dependencies": {
+    "register-service-worker": "^1.0.0",
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.1.0",
+    "@vue/cli-plugin-eslint": "^3.1.0",
+    "@vue/cli-plugin-pwa": "^3.1.0",
+    "@vue/cli-plugin-unit-mocha": "^3.1.0",
+    "@vue/cli-service": "^3.1.0",
+    "@vue/eslint-config-airbnb": "*",
+    "@vue/test-utils": "^1.0.0-beta.20",
+    "babel-eslint": "^10.0.1",
+    "commitizen": "^3.0.4",
+    "cross-env": "^5.2.0",
+    "cz-conventional-changelog": "^2.1.0",
+    "eslint": "^5.8.0",
+    "eslint-config-prettier": "^3.1.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "eslint-plugin-vue": "^5.0.0-0",
+    "lint-staged": "^8.0.4",
+    "node-sass": "^4.9.0",
+    "sass-loader": "^7.0.1",
+    "should": "^13.2.3",
+    "should-sinon": "0.0.6",
+    "standard-version": "^4.4.0",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.2",
+    "vue-template-compiler": "^2.5.17"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "cross-env NODE_ENV=production vue-cli-service lint",
+      "git add"
+    ],
+    "*.vue": [
+      "cross-env NODE_ENV=production vue-cli-service lint",
+      "git add"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
