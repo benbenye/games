@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "commit": "git-cz",
+    "commit": "lint-staged && git-cz -n",
     "release": "standard-version",
     "serve": "tools/vcs.js serve",
     "build": "tools/vcs.js build",
