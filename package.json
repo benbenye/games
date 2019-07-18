@@ -11,9 +11,14 @@
     "test:unit": "vue-cli-service test:unit -r should -r should-sinon"
   },
   "dependencies": {
+    "amfe-flexible": "^2.2.1",
+    "hammerjs": "^2.0.8",
+    "interactjs": "^1.4.0-rc.13",
+    "lodash": "^4.17.14",
+    "pixi.js": "^5.0.4",
     "register-service-worker": "^1.0.0",
-    "vue": "^2.5.17",
-    "vue-router": "^3.0.1"
+    "vue": "^2.6.10",
+    "vue-router": "^3.0.7"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.1.0",
@@ -24,23 +29,23 @@
     "@vue/eslint-config-airbnb": "*",
     "@vue/test-utils": "^1.0.0-beta.20",
     "babel-eslint": "^10.0.1",
-    "commitizen": "^3.0.4",
+    "commitizen": "^3.1.1",
     "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^2.1.0",
-    "eslint": "^5.8.0",
+    "eslint": "^5.16.0",
     "eslint-config-prettier": "^3.1.0",
     "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-vue": "^5.0.0-0",
     "inquirer": "^6.2.1",
     "lint-staged": "^8.0.4",
     "node-sass": "^4.9.0",
-    "sass-loader": "^7.0.1",
+    "sass-loader": "^7.1.0",
     "should": "^13.2.3",
     "should-sinon": "0.0.6",
     "standard-version": "^4.4.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
-    "vue-template-compiler": "^2.5.17"
+    "vue-template-compiler": "^2.6.10"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

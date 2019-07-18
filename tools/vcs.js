@@ -33,7 +33,7 @@ inquirer
     {
       type: 'list',
       name: 'site',
-      message: `Which site will you ${command}?`,
+      message: `Which game will you ${command}?`,
       choices: sites
     }
   ])

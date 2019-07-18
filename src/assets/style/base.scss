@@ -1,0 +1,49 @@
+html,body,div,ul,li,p,span,h1,h2,h3,img,article,aside,details,figcaption,figure,footer,header,main,nav,section,summary{
+  border:0;
+  padding:0;
+  margin:0;
+  -webkit-text-size-adjust: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  user-select: none;
+  outline:none;
+}
+
+ul,
+ol,
+li {
+  list-style: none;
+}
+
+ins,
+a,
+a:hover,
+a:active,
+a:visited,
+a:link,
+a:focus {
+  text-decoration: none;
+  display: block;
+  -webkit-touch-callout: none; /* 禁止长按链接与图片弹出菜单 */
+  text-decoration:none;
+  outline: none;
+  background: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: transparent; /* For some Androids */
+  -webkit-focus-ring-color: rgba(255, 255, 255, 0) !important;
+}
+*:not(input, textarea) {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+}
+
+::-webkit-scrollbar
+{
+  width: 0;
+  height: 0;
+}
+
+.clear::after {
+  display: block;
+  content: '';
+  clear: both;
+}

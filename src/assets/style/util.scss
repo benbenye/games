@@ -1,0 +1,182 @@
+/*
+* @mixin
+*@param $url 图片地址
+* @param $el 添加背景图片的元素（class类名）
+* @param $picname  背景图片名称
+* @param $picformt 背景图片格式
+* @param $bgsize   背景图片大小，默认100%；
+* 使用：在最顶层中直接引入 @include elebg(unres-btn ,res-btn, png);
+*/
+@mixin set-bg1($url,$el,$picname,$picformt,$bgWsize,$bgHsize){
+  [data-webp="0"] .#{$el}{
+      background: url('#{$url}img/#{$picname}.#{$picformt}') no-repeat;
+      background-size: $bgWsize $bgHsize;
+  }
+  [data-webp="1"] .#{$el}{
+      background: url('#{$url}webp/#{$picname}.webp') no-repeat;
+      background-size: $bgWsize $bgHsize;
+  }
+}
+/*
+*@const 根据1080p分辨率来设置比率
+**/
+$base-design-font-size:108px;
+/*
+* @Functions
+* @description 根据dpr设置字体大小
+* @param $number Include units number(含单位字符的数值)
+* @return pure number(纯数字)
+*/
+@mixin font-dpr($font-size){
+  [data-dpr="1"] & {
+    font-size: $font-size/3;
+  }
+
+  [data-dpr="2"] & {
+    font-size: $font-size/2;
+  }
+
+  [data-dpr="3"] & {
+    font-size: $font-size;
+  }
+}
+
+
+/*
+*@Mixin 去除内、外边距
+*/
+@mixin trip-padding-margin{
+  padding:0;
+  margin:0;
+}
+
+/*
+*@Mixin 满屏尺寸
+*/
+@mixin full-width-height{
+  width:100%;
+  height:100%;
+}
+
+/*
+*@Mixin 折行
+*/
+@mixin g-word-break{
+  word-break:break-all;
+  word-wrap:break-word;
+}
+
+/*
+*@mixin 主要供头发线来调用针对不同的dpr给1px解决方案
+*/
+@mixin prefixDpr($direct,$radius,$color:'bule',$dpr:2){
+  $scaleVul:0;
+  $scaleDirect:'scale';
+  @if $dpr == 1 {
+    &{
+      @if $direct == 'all'{
+        border: 1px solid $color;
+        @if $radius{
+          border-radius:#{$radius};
+        }
+
+      } @else{
+        border-#{$direct}: 1px solid $color;
+      }
+    }
+  }@else if $dpr >= 2 {
+    $scaleVul:.5;
+
+    &{
+      @if $direct == 'all'{
+        position:relative;
+      }
+      border: 0;
+      border-radius:0;
+    }
+    &:before {
+      content: ' ';
+      display: block;
+      position: absolute;
+      box-sizing:border-box;
+      top: 0;
+      left: 0;
+      transform-origin:0 0;
+      width:100% * $dpr;
+      height:100% * $dpr;
+      pointer-events: none;
+      transform: translate3d(0,0,0) #{$scaleDirect+'('+$scaleVul+')'};
+      @if $direct == 'all'{
+        border: 1px solid $color;
+        border-radius: #{$radius};
+      } @else{
+        border-#{$direct}: 1px solid $color;
+      }
+    }
+  }
+
+}
+
+/*
+*@mixin 解决android下1px的问题（头发线）
+*/
+@mixin hairline($radius,$direct: 'all',$color: #666) {
+  [data-os="ios"] & {
+    @include prefixDpr($direct,$radius,$color,1);
+  }
+
+  [data-os="android"] &{
+    @media only screen and (-webkit-min-device-pixel-ratio:1) {
+      @include prefixDpr($direct,$radius,$color,1);
+
+    }
+    @media only screen and (-webkit-min-device-pixel-ratio:2) and (-webkit-max-device-pixel-ratio:3){
+
+      @include prefixDpr($direct,$radius,$color,2);
+    }
+  }
+}
+
+@mixin text-ellipsis{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/*
+* @Functions
+* @description Strip units from $number(去掉数值后的单位)
+* @param $number Include units number(含单位字符的数值)
+* @return pure number(纯数字)
+*/
+@function __strip-units($number){
+  @if type-of($number) == 'number'{
+    @return $number/($number*0 +1);
+  }
+  @warn 'Exception in method __stip-unit : Not a number value: #{$number}';
+  @return $number;
+}
+/*
+* @Functions
+* @description Convert the px to rem (将实际的设计尺寸px转为相对的rem)
+* @param $origLen 设计图上的实际尺寸
+* @return rem
+*/
+@function px2rem($origLen){
+  $origLen : __strip-units($origLen);
+  $base-design-font-size: __strip-units($base-design-font-size);
+  @return #{$origLen/$base-design-font-size}rem;
+}
+
+/*
+* @Functions
+* @description Convert the ratio to percentage between real length and max length (得到实际长度和最大长度的百分比)
+* @param $tinyLen 设计图上的实际尺寸
+* @param $maxLen  设计图上的容器最大尺寸
+* @return percent(百分比)
+*/
+@function px2percent($realLen,$maxLen){
+  $realLen : __strip-units($realLen);
+  $maxLen : __strip-units($maxLen);
+  @return #{($realLen / $maxLen)*100+'%'};
+}
