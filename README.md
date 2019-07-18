@@ -1,4 +1,5 @@
-# multiple-site-seed
+# games
+益智游戏合辑
 
 ## Project setup
 ```bash
