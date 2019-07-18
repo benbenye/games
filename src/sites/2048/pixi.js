@@ -27,7 +27,7 @@ let app = new PIXI.Application({
 
 const pixi = {
   spriteWidth: viewWidth / dimension - 2 * margin,
-  speed: 10,
+  speed: 20,
   left: keyboard(37),
   up: keyboard(38),
   right: keyboard(39),
@@ -103,65 +103,65 @@ function loadProgressHandler (loader, resources) {
 }
 
 function move (sprite) {
-sprite.x += sprite.vx;
-sprite.y += sprite.vy;
-  const right = viewWidth - pixi.spriteWidth - 2 * margin
-        if (sprite.x < margin) {
-          sprite.x = margin;
-          sprite.vx = 0;
-        }
-        if (sprite.x > right) {
-          sprite.x = right;
-          sprite.vx = 0;
-        }
-        if (sprite.y > right) {
-          sprite.y = right;
-          sprite.vy = 0;
-        }
-        if (sprite.y < margin) {
-          sprite.y = margin;
-          sprite.vy = 0;
-        }
+  sprite.x += sprite.vx;
+  sprite.y += sprite.vy;
+  const right = viewWidth - pixi.spriteWidth - margin
+  if (sprite.x < margin) {
+    sprite.x = margin;
+    sprite.vx = 0;
+  }
+  if (sprite.x > right) {
+    sprite.x = right;
+    sprite.vx = 0;
+  }
+  if (sprite.y > right) {
+    sprite.y = right;
+    sprite.vy = 0;
+  }
+  if (sprite.y < margin) {
+    sprite.y = margin;
+    sprite.vy = 0;
+  }
 }
 
 function moveLeft () {
-    pixi.sprites.forEach(sprite => {
-      if (sprite.x > margin) {
-          sprite.vx = -pixi.speed;
-      }else {
-        sprite.vx = 0;
-      }
-    })
+  pixi.sprites.forEach(sprite => {
+    if (sprite.x > margin) {
+        sprite.vx = -pixi.speed;
+    }else {
+      sprite.vx = 0;
+    }
+  });
 }
 function moveRight () {
-  const right = viewWidth - pixi.spriteWidth - 2 * margin
-    pixi.sprites.forEach(sprite => {
-      if (sprite.x < right) {
-        sprite.vx = pixi.speed;
-      }else {
-        sprite.vx = 0;
-      }
-    })
+  const right = viewWidth - pixi.spriteWidth - margin
+  pixi.sprites.forEach(sprite => {
+    if (sprite.x < right) {
+      sprite.vx = pixi.speed;
+    }else {
+      sprite.vx = 0;
+    }
+  });
 }
 function moveDown () {
-  const down = viewWidth - pixi.spriteWidth - 2 * margin
-    pixi.sprites.forEach(sprite => {
-      if (sprite.y > down) {
-        sprite.vy = pixi.speed;
-      }else {
+  const down = viewWidth - pixi.spriteWidth - margin
+  pixi.sprites.forEach(sprite => {
+    if (sprite.y < down) {
+      sprite.vy = pixi.speed;
+    }else {
 
-        sprite.vy = 0;
-      }
-    })
+      sprite.vy = 0;
+    }
+  });
 }
 function moveUp () {
-    pixi.sprites.forEach(sprite => {
-      if (sprite.y > margin) {
-        sprite.vy = -pixi.speed;
-      }else {
-        sprite.vy = 0;
-      }
-    })
+  pixi.sprites.forEach(sprite => {
+    if (sprite.y > margin) {
+      sprite.vy = -pixi.speed;
+    }else {
+      sprite.vy = 0;
+    }
+  });
 }
 
 function keyboard(keyCode) {
