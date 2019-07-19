@@ -4,6 +4,7 @@
     <input class="dimension" type="number" v-model="dimension" />
     <div class="btn" @click="rebuild">dimension</div>
     <div class="btn" @click="restart">restart</div>
+    <div class="btn" @click="removeSprite">removeSprite</div>
     <div id="box" class="box" ref="box">
       <div id="pixi"></div>
       <piece-number v-for="(piece, index) in data.chess" :key="index" :n="piece.piece" />
@@ -36,6 +37,9 @@ export default {
     },
     rebuild() {
       data.init(this.dimension);
+    },
+    removeSprite() {
+      data.removeSprite();
     }
   }
 };

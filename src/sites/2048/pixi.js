@@ -1,30 +1,15 @@
+import _ from 'lodash';
 import * as PIXI from 'pixi.js'
 import logo from '../../assets/logo.png';
-import number from './assets/2048.png';
+import number from './assets/number.png';
 
 let viewWidth = window.innerWidth * 0.8;
 let dimension = 6;
 let margin = 6;
-let color = {
-  n2: 0xEEE4DA,
-  n4: 0xEDDFC7,
-  n8: 0xF2B179,
-  n16: 0xF69865,
-  n32: 0xF67C5F,
-  n64: 0xF5613C,
-  n128: 0xEDCF72,
-  n256: 0xEDCC61,
-  n512: 0xEDC850,
-  n1024: 0xE2B913,
-  n2048: 0xEDC22E,
-  n4096: 0x413E35
-};
-
 let app = new PIXI.Application({
   width: viewWidth,
   height: viewWidth
 });
-
 const pixi = {
   spriteWidth: viewWidth / dimension - 2 * margin,
   speed: 20,
@@ -32,16 +17,19 @@ const pixi = {
   up: keyboard(38),
   right: keyboard(39),
   down: keyboard(40),
-  moveLeft,
-  moveRight,
-  moveDown,
-  moveUp,
+  isMoving: false,
+  moveSprite,
   initView,
   drawRect,
   drawRectSprite,
-  sprites: []
+  removeSprite,
+  sprites: [],
+  textures: []
 }
 export default pixi;
+window.app = app;
+window.pixi = pixi;
+
 function initSize (n) {
   viewWidth = window.innerWidth * 0.8;
   dimension = n;
@@ -61,10 +49,21 @@ function initView (n, start) {
   app.renderer.view.style.padding = 0;
 
   app.loader
-    .add([logo, number])
+    .add([logo, number, {name: 'numberJson', url: '/img/2048/number.json'}])
     .on('progress', loadProgressHandler)
-    .load(start);
+    .load(() => {
+      createIdTexture();
+      start();
+      app.ticker.add(play);
+    });
+
+
 }
+
+function createIdTexture () {
+  pixi.textures = app.loader.resources['numberJson'].textures;
+}
+
 function drawRect ({x, y}) {
   const rectangle = new PIXI.Graphics();
   const spriteX = margin + (pixi.spriteWidth + 2 * margin) * x;
@@ -75,24 +74,26 @@ function drawRect ({x, y}) {
   app.stage.addChild(rectangle)
 }
 function drawRectSprite ({x, y}) {
+  console.log(x,y)
   const spriteX = margin + (pixi.spriteWidth + 2 * margin) * x;
   const spriteY = margin + (pixi.spriteWidth + 2 * margin) * y;
-  setupSprite({x: spriteX, y: spriteY});
+  setupSprite({
+    x: spriteX,
+    y: spriteY,
+    value: 2*x || 2
+  });
 }
 
-function setupSprite ({x, y}) {
-  let texture =app.loader.resources[number].texture;
-  let rectangle = new PIXI.Rectangle(0, 0, 200, 200);
-  texture.frame = rectangle;
-  let sprite2 = new PIXI.Sprite(texture);
+function setupSprite ({x, y, value}) {
+  let sprite2 = new PIXI.Sprite(pixi.textures[`n${value}.png`]);
   sprite2.x = x;
   sprite2.vx = 0;
   sprite2.vy = 0;
   sprite2.y = y;
+  sprite2.value = value;
   sprite2.width = pixi.spriteWidth;
   sprite2.height = pixi.spriteWidth;
   pixi.sprites.push(sprite2);
-  app.ticker.add(() => {move(sprite2)})
   app.stage.addChild(sprite2);
 }
 
@@ -102,99 +103,119 @@ function loadProgressHandler (loader, resources) {
   console.log("progress: " + loader.progress + "%");
 }
 
-function move (sprite) {
-  sprite.x += sprite.vx;
-  sprite.y += sprite.vy;
-  const right = viewWidth - pixi.spriteWidth - margin
-  if (sprite.x < margin) {
-    sprite.x = margin;
-    sprite.vx = 0;
-  }
-  if (sprite.x > right) {
-    sprite.x = right;
-    sprite.vx = 0;
-  }
-  if (sprite.y > right) {
-    sprite.y = right;
-    sprite.vy = 0;
-  }
-  if (sprite.y < margin) {
-    sprite.y = margin;
-    sprite.vy = 0;
-  }
+function findLeftHitSprite(x, y) {
+  return _.sortBy(
+    pixi.sprites
+      .filter(sprite => sprite.y === y),
+    [(s) => -s.x])
+  .find((sprite) => sprite.x < x );
 }
 
-function moveLeft () {
+function play () {
+  const right = viewWidth - pixi.spriteWidth - margin
   pixi.sprites.forEach(sprite => {
-    if (sprite.x > margin) {
+    sprite.x += sprite.vx;
+    sprite.y += sprite.vy;
+    let hitSprite = findLeftHitSprite(sprite.x, sprite.y);
+    if (hitSprite) {
+      if (hitTestRectangle(sprite, hitSprite)) {
+        console.log('hit')
+        if (sprite.value === hitSprite.value) {
+          console.log('merge')
+          hitMerge(hitSprite, sprite);
+        }else {
+          // 这个元素不能到头了
+          if (sprite.x < margin + pixi.spriteWidth + margin) {
+            sprite.x = 3 * margin + pixi.spriteWidth;
+            sprite.vx = 0;
+          }
+        }
+      }
+    } else {
+      if (sprite.x < margin) {
+        sprite.x = margin;
+        sprite.vx = 0;
+      }
+      if (sprite.x > right) {
+        sprite.x = right;
+        sprite.vx = 0;
+      }
+      if (sprite.y > right) {
+        sprite.y = right;
+        sprite.vy = 0;
+      }
+      if (sprite.y < margin) {
+        sprite.y = margin;
+        sprite.vy = 0;
+      }
+
+    }
+  })
+}
+
+function removeSprite () {
+  app.stage.removeChild(pixi.sprites[0])
+}
+
+function moveSprite (direction) {
+  const right = viewWidth - pixi.spriteWidth - margin
+  pixi.sprites.forEach(sprite => {
+    if (direction === 'l') {
+      if (sprite.x > margin) {
         sprite.vx = -pixi.speed;
-    }else {
-      sprite.vx = 0;
+      }else {
+        sprite.vx = 0;
+      }
+    }
+    if (direction === 'r') {
+      if (sprite.x < right) {
+        sprite.vx = pixi.speed;
+      }else {
+        sprite.vx = 0;
+      }
+    }
+    if (direction === 'u') {
+      if (sprite.y > margin) {
+        sprite.vy = -pixi.speed;
+      }else {
+        sprite.vy = 0;
+      }
+    }
+    if (direction === 'd') {
+      if (sprite.y < right) {
+        sprite.vy = pixi.speed;
+      }else {
+        sprite.vy = 0;
+      }
     }
   });
 }
-function moveRight () {
-  const right = viewWidth - pixi.spriteWidth - margin
-  pixi.sprites.forEach(sprite => {
-    if (sprite.x < right) {
-      sprite.vx = pixi.speed;
-    }else {
-      sprite.vx = 0;
-    }
-  });
-}
-function moveDown () {
-  const down = viewWidth - pixi.spriteWidth - margin
-  pixi.sprites.forEach(sprite => {
-    if (sprite.y < down) {
-      sprite.vy = pixi.speed;
-    }else {
 
-      sprite.vy = 0;
-    }
-  });
-}
-function moveUp () {
-  pixi.sprites.forEach(sprite => {
-    if (sprite.y > margin) {
-      sprite.vy = -pixi.speed;
-    }else {
-      sprite.vy = 0;
-    }
-  });
+function hitMerge(s1, s2) {
+  setupSprite({x: s1.x, y: s1.y, value: s1.value * 2});
+
+  app.stage.removeChild(s1)
+  app.stage.removeChild(s2)
+  pixi.sprites.splice(pixi.sprites.findIndex(sprite =>
+      sprite.x === s1.x && sprite.y === s1.y
+  ), 1)
+  pixi.sprites.splice(pixi.sprites.findIndex(sprite =>
+      sprite.x === s2.x && sprite.y === s2.y
+  ), 1)
 }
 
 function keyboard(keyCode) {
   let key = {};
   key.code = keyCode;
-  key.isDown = false;
-  key.isUp = true;
-  key.press = undefined;
   key.release = undefined;
-  //The `downHandler`
-  key.downHandler = event => {
-    if (event.keyCode === key.code) {
-      if (key.isUp && key.press) key.press();
-      key.isDown = true;
-      key.isUp = false;
-    }
-    event.preventDefault();
-  };
 
-  //The `upHandler`
   key.upHandler = event => {
     if (event.keyCode === key.code) {
-      if (key.isDown && key.release) key.release();
-      key.isDown = false;
-      key.isUp = true;
+      if (key.release) key.release();
     }
     event.preventDefault();
   };
 
-  //Attach event listeners
-  window.addEventListener(
-    "keydown", key.downHandler.bind(key), false
-  );
   window.addEventListener(
     "keyup", key.upHandler.bind(key), false
   );

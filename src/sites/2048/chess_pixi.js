@@ -7,7 +7,8 @@ export const data = {
   highestScore: 0,
   chess: [],
   init,
-  restart
+  restart,
+  removeSprite
 }
 
 function init (n = 4) {
@@ -19,9 +20,18 @@ function start (){
   data.chess.forEach(({piece}, index) => {
     pixi.drawRect(transform(index))
   })
-  initPieces();
-  initPieces();
-
+  // initPieces();
+  // initPieces();
+  // initPieces();
+  initPiecesByMe(0);
+  initPiecesByMe(1);
+  initPiecesByMe(2);
+  // initPiecesByMe(12);
+  // initPiecesByMe(13);
+  // initPiecesByMe(14);
+  // initPiecesByMe(16);
+  // initPiecesByMe(17);
+  // initPiecesByMe(18);
   moveHandler();
 }
 
@@ -36,6 +46,12 @@ function initChess () {
 
 function initPieces() {
   let index = random();
+  data.chess.splice(index, 1, {piece: 2, index});
+
+  pixi.drawRectSprite(transform(index));
+}
+
+function initPiecesByMe(index) {
   data.chess.splice(index, 1, {piece: 2, index});
 
   pixi.drawRectSprite(transform(index));
@@ -66,8 +82,8 @@ function nextIsEmpty (currentIndex) {
 
 function transform (num) {
   return {
-    x: _.floor(num / data.dimension),
-    y: num % data.dimension
+    y: _.floor(num / data.dimension),
+    x: num % data.dimension
   };
 }
 
@@ -81,19 +97,19 @@ function isOver () {
 
 function moveHandler () {
   pixi.left.release = () => {
-    console.log('left release');
-    pixi.moveLeft();
+    pixi.moveSprite('l');
   }
   pixi.right.release = () => {
-    console.log('right release')
-    pixi.moveRight();
+    pixi.moveSprite('r');
   }
   pixi.down.release = () => {
-    console.log('down release')
-    pixi.moveDown();
+    pixi.moveSprite('d');
   }
   pixi.up.release = () => {
-    console.log('up release')
-    pixi.moveUp();
+    pixi.moveSprite('u');
   }
+}
+
+function removeSprite () {
+  pixi.removeSprite();
 }
