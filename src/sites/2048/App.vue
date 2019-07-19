@@ -28,8 +28,7 @@ export default {
   },
   mounted() {
     this.box = this.$refs.box;
-    data.init(this.dimension);
-    TouchDirection(this.box);
+    data.init(this.dimension, TouchDirection(this.box));
   },
   methods: {
     restart() {

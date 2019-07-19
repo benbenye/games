@@ -11,28 +11,34 @@ export const data = {
   removeSprite
 }
 
-function init (n = 4) {
+function init (n = 4, touch) {
   data.dimension = n;
   initChess();
-  pixi.initView(n, start);
+  pixi.initView(n, function (){
+    start(touch)
+  });
 }
-function start (){
+function start (touch){
   data.chess.forEach(({piece}, index) => {
     pixi.drawRect(transform(index))
   })
   // initPieces();
   // initPieces();
   // initPieces();
+  // initPieces();
+  // initPieces();
   initPiecesByMe(0);
   initPiecesByMe(1);
   initPiecesByMe(2);
+  initPiecesByMe(3);
+  initPiecesByMe(4);
   // initPiecesByMe(12);
   // initPiecesByMe(13);
   // initPiecesByMe(14);
   // initPiecesByMe(16);
   // initPiecesByMe(17);
   // initPiecesByMe(18);
-  moveHandler();
+  moveHandler(touch);
 }
 
 
@@ -48,13 +54,13 @@ function initPieces() {
   let index = random();
   data.chess.splice(index, 1, {piece: 2, index});
 
-  pixi.drawRectSprite(transform(index));
+  pixi.drawRectSprite({...transform(index), value: 2});
 }
 
 function initPiecesByMe(index) {
   data.chess.splice(index, 1, {piece: 2, index});
 
-  pixi.drawRectSprite(transform(index));
+  pixi.drawRectSprite({...transform(index), value: 2});
 }
 
 function restart () {
@@ -95,21 +101,29 @@ function isOver () {
   return false;
 }
 
-function moveHandler () {
+function moveHandler (touch) {
+  if (touch) {
+    touch
+      .on('swipe', (e) => {
+        pixi.moveSprite(e.offsetDirection);
+      });
+  }
   pixi.left.release = () => {
-    pixi.moveSprite('l');
+    pixi.moveSprite(2);
   }
   pixi.right.release = () => {
-    pixi.moveSprite('r');
+    pixi.moveSprite(4);
   }
   pixi.down.release = () => {
-    pixi.moveSprite('d');
+    pixi.moveSprite(16);
   }
   pixi.up.release = () => {
-    pixi.moveSprite('u');
+    pixi.moveSprite(8);
   }
 }
 
 function removeSprite () {
   pixi.removeSprite();
 }
+
+

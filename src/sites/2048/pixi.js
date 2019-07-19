@@ -73,24 +73,26 @@ function drawRect ({x, y}) {
   rectangle.endFill();
   app.stage.addChild(rectangle)
 }
-function drawRectSprite ({x, y}) {
-  console.log(x,y)
+function drawRectSprite ({x, y, value}) {
   const spriteX = margin + (pixi.spriteWidth + 2 * margin) * x;
   const spriteY = margin + (pixi.spriteWidth + 2 * margin) * y;
   setupSprite({
     x: spriteX,
     y: spriteY,
-    value: 2*x || 2
+    value,
+    pp: `${x}:${y}`
   });
 }
 
-function setupSprite ({x, y, value}) {
+function setupSprite ({x, y, value, pp}) {
   let sprite2 = new PIXI.Sprite(pixi.textures[`n${value}.png`]);
   sprite2.x = x;
   sprite2.vx = 0;
   sprite2.vy = 0;
   sprite2.y = y;
+  sprite2.pp = pp;
   sprite2.value = value;
+  sprite2.isNew = true;
   sprite2.width = pixi.spriteWidth;
   sprite2.height = pixi.spriteWidth;
   pixi.sprites.push(sprite2);
@@ -99,7 +101,6 @@ function setupSprite ({x, y, value}) {
 
 function loadProgressHandler (loader, resources) {
   console.log("loading: " + resources.url);
-
   console.log("progress: " + loader.progress + "%");
 }
 
@@ -113,22 +114,22 @@ function findLeftHitSprite(x, y) {
 
 function play () {
   const right = viewWidth - pixi.spriteWidth - margin
-  pixi.sprites.forEach(sprite => {
+  pixi.sprites.forEach((sprite, i) => {
     sprite.x += sprite.vx;
     sprite.y += sprite.vy;
     let hitSprite = findLeftHitSprite(sprite.x, sprite.y);
     if (hitSprite) {
       if (hitTestRectangle(sprite, hitSprite)) {
-        console.log('hit')
-        if (sprite.value === hitSprite.value) {
-          console.log('merge')
+        if (
+          sprite.value === hitSprite.value &&
+          !hitSprite.isNew &&
+          !hitSprite.vx
+          ) {
           hitMerge(hitSprite, sprite);
         }else {
-          // 这个元素不能到头了
-          if (sprite.x < margin + pixi.spriteWidth + margin) {
-            sprite.x = 3 * margin + pixi.spriteWidth;
-            sprite.vx = 0;
-          }
+          // the diffrent sprite should be the same speed
+          sprite.x = hitSprite.x + pixi.spriteWidth + margin * 2;
+          sprite.vx = hitSprite.vx;
         }
       }
     } else {
@@ -150,6 +151,7 @@ function play () {
       }
 
     }
+
   })
 }
 
@@ -159,29 +161,30 @@ function removeSprite () {
 
 function moveSprite (direction) {
   const right = viewWidth - pixi.spriteWidth - margin
-  pixi.sprites.forEach(sprite => {
-    if (direction === 'l') {
+  pixi.sprites.forEach((sprite, i) => {
+    sprite.isNew = false;
+    if (direction === 2) {
       if (sprite.x > margin) {
         sprite.vx = -pixi.speed;
       }else {
         sprite.vx = 0;
       }
     }
-    if (direction === 'r') {
+    if (direction === 4) {
       if (sprite.x < right) {
         sprite.vx = pixi.speed;
       }else {
         sprite.vx = 0;
       }
     }
-    if (direction === 'u') {
+    if (direction === 8) {
       if (sprite.y > margin) {
         sprite.vy = -pixi.speed;
       }else {
         sprite.vy = 0;
       }
     }
-    if (direction === 'd') {
+    if (direction === 16) {
       if (sprite.y < right) {
         sprite.vy = pixi.speed;
       }else {
