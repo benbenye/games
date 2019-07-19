@@ -164,19 +164,19 @@ function play () {
           // the diffrent sprite should be the same speed
           if (pixi.moveDirection === 2) {
             sprite.x = hitSprite.x + pixi.spriteWidth + margin * 2;
-          sprite.vx = hitSprite.vx;
+            sprite.vx = hitSprite.vx;
           }
           if (pixi.moveDirection === 4) {
             sprite.x = hitSprite.x - pixi.spriteWidth - margin * 2;
-          sprite.vx = hitSprite.vx;
+            sprite.vx = hitSprite.vx;
           }
           if (pixi.moveDirection === 8) {
             sprite.y = hitSprite.y + pixi.spriteWidth + margin * 2;
-          sprite.vy = hitSprite.vy;
+            sprite.vy = hitSprite.vy;
           }
           if (pixi.moveDirection === 16) {
             sprite.y = hitSprite.y - pixi.spriteWidth - margin * 2;
-          sprite.vy = hitSprite.vy;
+            sprite.vy = hitSprite.vy;
           }
         }
       }
@@ -199,8 +199,13 @@ function play () {
       }
 
     }
-
-  })
+  });
+  if (pixi.sprites.every(sprite =>
+    sprite.vx === 0 && sprite.vy === 0
+  )) {
+    // one step is over
+    randomTwoSprites();
+  }
 }
 
 function removeSprite () {
