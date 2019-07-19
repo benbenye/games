@@ -27,17 +27,20 @@ function start (touch){
   // initPieces();
   // initPieces();
   // initPieces();
-  initPiecesByMe(0);
-  initPiecesByMe(1);
-  initPiecesByMe(2);
-  initPiecesByMe(3);
-  initPiecesByMe(4);
-  // initPiecesByMe(12);
-  // initPiecesByMe(13);
+  // initPiecesByMe(0);
+  // initPiecesByMe(1);
+  // initPiecesByMe(2);
+  // initPiecesByMe(3);
+  // initPiecesByMe(4);
+  initPiecesByMe(10);
+  initPiecesByMe(11);
+  initPiecesByMe(12);
+  initPiecesByMe(13);
   // initPiecesByMe(14);
-  // initPiecesByMe(16);
-  // initPiecesByMe(17);
-  // initPiecesByMe(18);
+  initPiecesByMe(15);
+  initPiecesByMe(16);
+  initPiecesByMe(17);
+  initPiecesByMe(18);
   moveHandler(touch);
 }
 

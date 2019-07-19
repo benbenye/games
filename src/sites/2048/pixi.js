@@ -24,7 +24,8 @@ const pixi = {
   drawRectSprite,
   removeSprite,
   sprites: [],
-  textures: []
+  textures: [],
+  moveDirection: 0
 }
 export default pixi;
 window.app = app;
@@ -79,18 +80,16 @@ function drawRectSprite ({x, y, value}) {
   setupSprite({
     x: spriteX,
     y: spriteY,
-    value,
-    pp: `${x}:${y}`
+    value
   });
 }
 
-function setupSprite ({x, y, value, pp}) {
+function setupSprite ({x, y, value, v = {vx:0,vy:0}}) {
   let sprite2 = new PIXI.Sprite(pixi.textures[`n${value}.png`]);
   sprite2.x = x;
-  sprite2.vx = 0;
-  sprite2.vy = 0;
+  sprite2.vx = v.vx;
+  sprite2.vy = v.vy;
   sprite2.y = y;
-  sprite2.pp = pp;
   sprite2.value = value;
   sprite2.isNew = true;
   sprite2.width = pixi.spriteWidth;
@@ -111,25 +110,74 @@ function findLeftHitSprite(x, y) {
     [(s) => -s.x])
   .find((sprite) => sprite.x < x );
 }
+function findRightHitSprite(x, y) {
+  return _.sortBy(
+    pixi.sprites
+      .filter(sprite => sprite.y === y),
+    [(s) => s.x])
+  .find((sprite) => sprite.x > x );
+}
+function findUpHitSprite(x, y) {
+  return _.sortBy(
+    pixi.sprites
+      .filter(sprite => sprite.x === x),
+    [(s) => -s.y])
+  .find((sprite) => sprite.y < y );
+}
+function findDownHitSprite(x, y) {
+  return _.sortBy(
+    pixi.sprites
+      .filter(sprite => sprite.x === x),
+    [(s) => s.y])
+  .find((sprite) => sprite.y > y );
+}
 
 function play () {
   const right = viewWidth - pixi.spriteWidth - margin
   pixi.sprites.forEach((sprite, i) => {
     sprite.x += sprite.vx;
     sprite.y += sprite.vy;
-    let hitSprite = findLeftHitSprite(sprite.x, sprite.y);
+    let hitSprite = null;
+    if (pixi.moveDirection === 2) {
+      hitSprite = findLeftHitSprite(sprite.x, sprite.y);
+    }
+    if (pixi.moveDirection === 4) {
+      hitSprite = findRightHitSprite(sprite.x, sprite.y);
+    }
+    if (pixi.moveDirection === 8) {
+      hitSprite = findUpHitSprite(sprite.x, sprite.y);
+    }
+    if (pixi.moveDirection === 16) {
+      hitSprite = findDownHitSprite(sprite.x, sprite.y);
+    }
     if (hitSprite) {
       if (hitTestRectangle(sprite, hitSprite)) {
+        console.log('hit')
         if (
           sprite.value === hitSprite.value &&
           !hitSprite.isNew &&
-          !hitSprite.vx
+          (!hitSprite.vx || !hitSprite.vy)
           ) {
+            console.log('merge')
           hitMerge(hitSprite, sprite);
         }else {
           // the diffrent sprite should be the same speed
-          sprite.x = hitSprite.x + pixi.spriteWidth + margin * 2;
+          if (pixi.moveDirection === 2) {
+            sprite.x = hitSprite.x + pixi.spriteWidth + margin * 2;
           sprite.vx = hitSprite.vx;
+          }
+          if (pixi.moveDirection === 4) {
+            sprite.x = hitSprite.x - pixi.spriteWidth - margin * 2;
+          sprite.vx = hitSprite.vx;
+          }
+          if (pixi.moveDirection === 8) {
+            sprite.y = hitSprite.y + pixi.spriteWidth + margin * 2;
+          sprite.vy = hitSprite.vy;
+          }
+          if (pixi.moveDirection === 16) {
+            sprite.y = hitSprite.y - pixi.spriteWidth - margin * 2;
+          sprite.vy = hitSprite.vy;
+          }
         }
       }
     } else {
@@ -160,6 +208,7 @@ function removeSprite () {
 }
 
 function moveSprite (direction) {
+  pixi.moveDirection = direction;
   const right = viewWidth - pixi.spriteWidth - margin
   pixi.sprites.forEach((sprite, i) => {
     sprite.isNew = false;
@@ -195,7 +244,7 @@ function moveSprite (direction) {
 }
 
 function hitMerge(s1, s2) {
-  setupSprite({x: s1.x, y: s1.y, value: s1.value * 2});
+  setupSprite({x: s1.x, y: s1.y, value: s1.value * 2, v: {vx:s1.vx, vy:s1.vy}});
 
   app.stage.removeChild(s1)
   app.stage.removeChild(s2)
