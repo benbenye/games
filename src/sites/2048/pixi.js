@@ -24,8 +24,11 @@ const pixi = {
   drawRectSprite,
   removeSprite,
   sprites: [],
+  mergeSprites: [],
   textures: [],
-  moveDirection: 0
+  moveDirection: 0,
+  moveSteps: [],
+  isReserve: false//精灵顺序是否反序
 }
 export default pixi;
 window.app = app;
@@ -57,8 +60,6 @@ function initView (n, start) {
       start();
       app.ticker.add(play);
     });
-
-
 }
 
 function createIdTexture () {
@@ -94,6 +95,10 @@ function setupSprite ({x, y, value, v = {vx:0,vy:0}}) {
   sprite2.isNew = true;
   sprite2.width = pixi.spriteWidth;
   sprite2.height = pixi.spriteWidth;
+  // if (v.vx || v.vy) {
+  //   console.log('spliceS1')
+  //   pixi.sprites.splice(pixi.sprites.findIndex(s => s.x === sprite2.x && s.y === sprite2.y), 0, sprite2);
+  // }
   pixi.sprites.push(sprite2);
   app.stage.addChild(sprite2);
 }
@@ -104,36 +109,61 @@ function loadProgressHandler (loader, resources) {
 }
 
 function findLeftHitSprite(x, y) {
-  return _.sortBy(
+  let hitSprite = _.sortBy(
     pixi.sprites
       .filter(sprite => sprite.y === y),
     [(s) => -s.x])
   .find((sprite) => sprite.x < x );
+
+  if (hitSprite) {
+    return !hitSprite.hasHitSprite && hitSprite;
+  }
+  return hitSprite;
 }
 function findRightHitSprite(x, y) {
-  return _.sortBy(
+  let hitSprite = _.sortBy(
     pixi.sprites
       .filter(sprite => sprite.y === y),
     [(s) => s.x])
   .find((sprite) => sprite.x > x );
+  if (hitSprite) {
+    return !hitSprite.hasHitSprite && hitSprite;
+  }
+  return hitSprite;
 }
 function findUpHitSprite(x, y) {
-  return _.sortBy(
+  let hitSprite = _.sortBy(
     pixi.sprites
       .filter(sprite => sprite.x === x),
     [(s) => -s.y])
   .find((sprite) => sprite.y < y );
+  if (hitSprite) {
+    return !hitSprite.hasHitSprite && hitSprite;
+  }
+  return hitSprite;
 }
 function findDownHitSprite(x, y) {
-  return _.sortBy(
+  let hitSprite = _.sortBy(
     pixi.sprites
       .filter(sprite => sprite.x === x),
     [(s) => s.y])
   .find((sprite) => sprite.y > y );
+  if (hitSprite) {
+    return !hitSprite.hasHitSprite && hitSprite;
+  }
+  return hitSprite;
 }
 
 function play () {
-  const right = viewWidth - pixi.spriteWidth - margin
+  if (pixi.sprites.every(sprite => {
+    return sprite.vx === 0 && sprite.vy === 0
+  })) {
+    // one step is over
+    // randomTwoSprites();
+    // pixi.initPieces();
+    two()
+  }
+  const right = viewWidth - pixi.spriteWidth - margin;
   pixi.sprites.forEach((sprite, i) => {
     sprite.x += sprite.vx;
     sprite.y += sprite.vy;
@@ -152,16 +182,15 @@ function play () {
     }
     if (hitSprite) {
       if (hitTestRectangle(sprite, hitSprite)) {
-        console.log('hit')
         if (
           sprite.value === hitSprite.value &&
           !hitSprite.isNew &&
+          !sprite.isNew &&
           (!hitSprite.vx || !hitSprite.vy)
           ) {
-            console.log('merge')
-          hitMerge(hitSprite, sprite);
+            sprite.hasHitSprite = true;
+            pixi.mergeSprites.push({s1: sprite, s2: hitSprite});
         }else {
-          // the diffrent sprite should be the same speed
           if (pixi.moveDirection === 2) {
             sprite.x = hitSprite.x + pixi.spriteWidth + margin * 2;
             sprite.vx = hitSprite.vx;
@@ -200,12 +229,18 @@ function play () {
 
     }
   });
-  if (pixi.sprites.every(sprite =>
-    sprite.vx === 0 && sprite.vy === 0
-  )) {
-    // one step is over
-    randomTwoSprites();
-  }
+  pixi.mergeSprites.forEach(merge => {
+    hitMerge(merge.s1, merge.s2);
+  });
+  pixi.mergeSprites = [];
+}
+function two () {
+  if (pixi.two) return;
+  pixi.two = true;
+  pixi.sprites.forEach(s => {
+    console.log(`x:${s.x},y:${s.y},value:${s.value}`)
+  });
+
 }
 
 function removeSprite () {
@@ -213,52 +248,49 @@ function removeSprite () {
 }
 
 function moveSprite (direction) {
+  pixi.two = false;
   pixi.moveDirection = direction;
-  const right = viewWidth - pixi.spriteWidth - margin
-  pixi.sprites.forEach((sprite, i) => {
+  pixi.moveSteps.push = direction;
+  pixi.sprites.forEach(s => s.isNew = false)
+  if (
+    (pixi.isReserve && (direction === 2 || direction === 8)) ||
+    (!pixi.isReserve && (direction === 4 || direction === 16))
+    ) {
+      pixi.sprites = pixi.sprites.reverse();
+      pixi.isReserve = true;
+    } else {
+      pixi.isReserve = false;
+    }
+  pixi.sprites.forEach(sprite => {
     sprite.isNew = false;
     if (direction === 2) {
-      if (sprite.x > margin) {
-        sprite.vx = -pixi.speed;
-      }else {
-        sprite.vx = 0;
-      }
+      sprite.vx = -pixi.speed;
     }
     if (direction === 4) {
-      if (sprite.x < right) {
-        sprite.vx = pixi.speed;
-      }else {
-        sprite.vx = 0;
-      }
+      sprite.vx = pixi.speed;
     }
     if (direction === 8) {
-      if (sprite.y > margin) {
-        sprite.vy = -pixi.speed;
-      }else {
-        sprite.vy = 0;
-      }
+      sprite.vy = -pixi.speed;
     }
     if (direction === 16) {
-      if (sprite.y < right) {
-        sprite.vy = pixi.speed;
-      }else {
-        sprite.vy = 0;
-      }
+      sprite.vy = pixi.speed;
     }
   });
 }
 
 function hitMerge(s1, s2) {
+  // s1 is the current sprite
+  // s2 is the hit sprite
   setupSprite({x: s1.x, y: s1.y, value: s1.value * 2, v: {vx:s1.vx, vy:s1.vy}});
+  app.stage.removeChild(s1);
+  app.stage.removeChild(s2);
 
-  app.stage.removeChild(s1)
-  app.stage.removeChild(s2)
   pixi.sprites.splice(pixi.sprites.findIndex(sprite =>
       sprite.x === s1.x && sprite.y === s1.y
-  ), 1)
+  ), 1);
   pixi.sprites.splice(pixi.sprites.findIndex(sprite =>
       sprite.x === s2.x && sprite.y === s2.y
-  ), 1)
+  ), 1);
 }
 
 function keyboard(keyCode) {

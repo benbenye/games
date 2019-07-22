@@ -15,7 +15,8 @@ function init (n = 4, touch) {
   data.dimension = n;
   initChess();
   pixi.initView(n, function (){
-    start(touch)
+    start(touch);
+    pixi.initPieces = initPieces;
   });
 }
 function start (touch){
@@ -27,20 +28,20 @@ function start (touch){
   // initPieces();
   // initPieces();
   // initPieces();
-  // initPiecesByMe(0);
-  // initPiecesByMe(1);
-  // initPiecesByMe(2);
+  initPiecesByMe(0);
+  initPiecesByMe(1);
+  initPiecesByMe(2);
   // initPiecesByMe(3);
   // initPiecesByMe(4);
   initPiecesByMe(10);
   initPiecesByMe(11);
-  initPiecesByMe(12);
+  // initPiecesByMe(12);
   initPiecesByMe(13);
   // initPiecesByMe(14);
   initPiecesByMe(15);
-  initPiecesByMe(16);
-  initPiecesByMe(17);
-  initPiecesByMe(18);
+  // initPiecesByMe(16);
+  // initPiecesByMe(17);
+  // initPiecesByMe(18);
   moveHandler(touch);
 }
 
@@ -54,12 +55,13 @@ function initChess () {
 }
 
 function initPieces() {
-  let index = random();
-  data.chess.splice(index, 1, {piece: 2, index});
+  let index = randomInt(0, data.dimension * data.dimension);
 
   pixi.drawRectSprite({...transform(index), value: 2});
 }
-
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 function initPiecesByMe(index) {
   data.chess.splice(index, 1, {piece: 2, index});
 
@@ -71,24 +73,6 @@ function restart () {
   init();
 }
 
-function random () {
-  if (isOver()) return;
-  let randomChess = _.filter(data.chess, ({piece}) => !piece);
-  const randomIndex = _.random(randomChess.length - 1);
-  return randomChess[randomIndex].index;
-}
-
-function nextIsEmpty (currentIndex) {
-  let nextIndex = 0;
-  if (currentIndex >= data.dimension * data.dimension - 1) {
-    nextIndex = 0;
-    if (data.chess[nextIndex]) {
-      nextIsEmpty(nextIndex);
-    }
-  }
-
-}
-
 function transform (num) {
   return {
     y: _.floor(num / data.dimension),
@@ -96,13 +80,6 @@ function transform (num) {
   };
 }
 
-function isOver () {
-  if (!data.chess.filter(({piece}) => !piece).length ) {
-    alert('game over');
-    return true;
-  }
-  return false;
-}
 
 function moveHandler (touch) {
   if (touch) {
