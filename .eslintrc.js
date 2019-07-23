@@ -11,7 +11,7 @@ module.exports = {
     'prettier/vue'
   ],
   rules: {
-    'linebreak-style': 0,
+    'end-of-line': 0,
     'prettier/prettier': ['error'],
     'vue/singleline-html-element-content-newline': 0,
     'no-return-assign': ['error', 'except-parens'],

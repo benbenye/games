@@ -159,9 +159,7 @@ function play () {
     return sprite.vx === 0 && sprite.vy === 0
   })) {
     // one step is over
-    // randomTwoSprites();
-    // pixi.initPieces();
-    two()
+    initRandomSprite();
   }
   const right = viewWidth - pixi.spriteWidth - margin;
   pixi.sprites.forEach((sprite, i) => {
@@ -234,21 +232,47 @@ function play () {
   });
   pixi.mergeSprites = [];
 }
-function two () {
-  if (pixi.two) return;
-  pixi.two = true;
+function initRandomSprite () {
+  if (pixi.isInitRandomSprite) return;
+  pixi.isInitRandomSprite = true;
+  let index = randomInt(0, dimension * dimension)
+  console.log(index);
+  const isRepeat = checkIsRepeat(index);
+  if (isRepeat) {
+    index += 1;
+    index = index % 16;
+    checkIsRepeat(index);
+  }
+  pixi.drawRectSprite({...transform(index), value: 2})
   pixi.sprites.forEach(s => {
-    console.log(`x:${s.x},y:${s.y},value:${s.value}`)
+    console.log(`x:${s.x},y:${s.y},value:${s.value}`);
   });
+}
+function checkIsRepeat(index) {
+  const {x, y} = transform(index);
+  // judge is repeat
+  const spriteX = margin + (pixi.spriteWidth + 2 * margin) * x;
+  const spriteY = margin + (pixi.spriteWidth + 2 * margin) * y;
+  return pixi.sprites.find(sprite => sprite.x === spriteX && sprite.y === spriteY);
 
 }
 
+function transform (num) {
+  return {
+    y: _.floor(num / dimension),
+    x: num % dimension
+  };
+}
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 function removeSprite () {
   app.stage.removeChild(pixi.sprites[0])
 }
 
 function moveSprite (direction) {
-  pixi.two = false;
+  pixi.isInitRandomSprite = false;
   pixi.moveDirection = direction;
   pixi.moveSteps.push = direction;
   pixi.sprites.forEach(s => s.isNew = false)

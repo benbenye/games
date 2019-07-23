@@ -7,7 +7,7 @@
     <div class="btn" @click="removeSprite">removeSprite</div>
     <div id="box" class="box" ref="box">
       <div id="pixi"></div>
-      <piece-number v-for="(piece, index) in data.chess" :key="index" :n="piece.piece" />
+      <!-- <piece-number v-for="(piece, index) in data.chess" :key="index" :n="piece.piece" /> -->
     </div>
   </div>
 </template>
@@ -45,15 +45,14 @@ export default {
 </script>
 
 <style lang="scss">
-@import url(~@/assets/style/base.scss);
+@import '~@/assets/style/base.scss';
 </style>
 
 <style lang="scss" scoped>
-// @import url(~@/assets/style/util.scss);
-$ss: 20px;
+@import '~@/assets/style/util.scss';
 .name {
   color: #776e65;
-  font-size: $ss;
+  font-size: px2rem(20);
   font-weight: 900;
 }
 .box {
@@ -68,7 +67,7 @@ $ss: 20px;
   display: inline-block;
   color: #fff;
   margin-left: 30px;
-  padding: $ss;
+  padding: px2rem(20);
   border-radius: 5px;
 }
 </style>
