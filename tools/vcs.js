@@ -8,7 +8,7 @@ function runSite(site) {
   let params = `src/sites/${site}/main.js`;
   if (command === 'build') params = `--dest dist/${site} ${params}`;
 
-  const cmd = `vue-cli-service ${command} ${params}`;
+  const cmd = `SITE=${site} vue-cli-service ${command} ${params}`;
   // eslint-disable-next-line no-console
   console.log(cmd);
   spawn(cmd, {

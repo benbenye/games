@@ -1,3 +1,6 @@
+const site = process.env.SITE;
+const baseUrl = `/games/${site}`;
+
 module.exports = {
   lintOnSave: false,
   css: {
@@ -6,5 +9,6 @@ module.exports = {
         camelCase: 'dashesOnly'
       }
     }
-  }
+  },
+  baseUrl
 };
