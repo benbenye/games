@@ -4,7 +4,6 @@
     <input class="dimension" type="number" v-model="dimension" />
     <div class="btn" @click="rebuild">dimension</div>
     <div class="btn" @click="restart">restart</div>
-    <div class="btn" @click="removeSprite">removeSprite</div>
     <div id="box" class="box" ref="box">
       <div id="pixi"></div>
       <!-- <piece-number v-for="(piece, index) in data.chess" :key="index" :n="piece.piece" /> -->
@@ -36,9 +35,6 @@ export default {
     },
     rebuild() {
       data.init(this.dimension);
-    },
-    removeSprite() {
-      data.removeSprite();
     }
   }
 };
@@ -50,17 +46,22 @@ export default {
 
 <style lang="scss" scoped>
 @import '~@/assets/style/util.scss';
+#app {
+  // width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
 .name {
   color: #776e65;
-  font-size: px2rem(20);
+  font-size: px2rem(100);
   font-weight: 900;
 }
 .box {
-  width: 80%;
-  padding: 6px;
   background-color: #bbada0;
-  display: flex;
-  flex-wrap: wrap;
+  margin-top: px2rem(50);
+  canvas {
+    margin: 6px;
+  }
 }
 .btn {
   background-color: #413e35;
