@@ -10,9 +10,13 @@ let app = new PIXI.Application({
   width: viewWidth,
   height: viewWidth
 });
+function strip(num, precision = 12) {
+  const w = +parseFloat(num.toPrecision(precision));
+  return w;
+}
 const pixi = {
-  spriteWidth: viewWidth / dimension - 2 * margin,
-  speed: 20,
+  spriteWidth: strip(viewWidth / dimension - 2 * margin),
+  speed: 50,
   left: keyboard(37),
   up: keyboard(38),
   right: keyboard(39),
@@ -37,7 +41,7 @@ window.pixi = pixi;
 function initSize (n) {
   viewWidth = window.innerWidth * 0.8;
   dimension = n;
-  pixi.spriteWidth = viewWidth / dimension - 2 * margin;
+  pixi.spriteWidth = strip(viewWidth / dimension - 2 * margin);
 }
 function initView (n, start) {
   initSize(n);
@@ -68,16 +72,16 @@ function createIdTexture () {
 
 function drawRect ({x, y}) {
   const rectangle = new PIXI.Graphics();
-  const spriteX = margin + (pixi.spriteWidth + 2 * margin) * x;
-  const spriteY = margin + (pixi.spriteWidth + 2 * margin) * y;
+  const spriteX = strip(margin + (pixi.spriteWidth + 2 * margin) * x);
+  const spriteY = strip(margin + (pixi.spriteWidth + 2 * margin) * y);
   rectangle.beginFill(0xCCC0B3);
   rectangle.drawRoundedRect(spriteX, spriteY, pixi.spriteWidth, pixi.spriteWidth, 5);
   rectangle.endFill();
   app.stage.addChild(rectangle)
 }
 function drawRectSprite ({x, y, value}) {
-  const spriteX = margin + (pixi.spriteWidth + 2 * margin) * x;
-  const spriteY = margin + (pixi.spriteWidth + 2 * margin) * y;
+  const spriteX = strip(margin + (pixi.spriteWidth + 2 * margin) * x);
+  const spriteY = strip(margin + (pixi.spriteWidth + 2 * margin) * y);
   setupSprite({
     x: spriteX,
     y: spriteY,
@@ -87,10 +91,11 @@ function drawRectSprite ({x, y, value}) {
 
 function setupSprite ({x, y, value, v = {vx:0,vy:0}}) {
   let sprite2 = new PIXI.Sprite(pixi.textures[`n${value}.png`]);
-  sprite2.x = x;
+  // let container = new PIXI.Container();
+  sprite2.x = strip(x);
   sprite2.vx = v.vx;
   sprite2.vy = v.vy;
-  sprite2.y = y;
+  sprite2.y = strip(y);
   sprite2.value = value;
   sprite2.isNew = true;
   sprite2.width = pixi.spriteWidth;
@@ -99,6 +104,7 @@ function setupSprite ({x, y, value, v = {vx:0,vy:0}}) {
   //   console.log('spliceS1')
   //   pixi.sprites.splice(pixi.sprites.findIndex(s => s.x === sprite2.x && s.y === sprite2.y), 0, sprite2);
   // }
+  // container.addChild(sprite2);
   pixi.sprites.push(sprite2);
   app.stage.addChild(sprite2);
 }
@@ -158,13 +164,17 @@ function play () {
   if (pixi.sprites.every(sprite => {
     return sprite.vx === 0 && sprite.vy === 0
   })) {
+    // nothing can be moved
+
     // one step is over
     initRandomSprite();
   }
-  const right = viewWidth - pixi.spriteWidth - margin;
+  const right = strip(viewWidth - pixi.spriteWidth - margin);
   pixi.sprites.forEach((sprite, i) => {
     sprite.x += sprite.vx;
     sprite.y += sprite.vy;
+    // console.log(sprite.x)
+    // console.log(sprite.y)
     let hitSprite = null;
     if (pixi.moveDirection === 2) {
       hitSprite = findLeftHitSprite(sprite.x, sprite.y);
@@ -190,19 +200,19 @@ function play () {
             pixi.mergeSprites.push({s1: sprite, s2: hitSprite});
         }else {
           if (pixi.moveDirection === 2) {
-            sprite.x = hitSprite.x + pixi.spriteWidth + margin * 2;
+            sprite.x = strip(hitSprite.x + pixi.spriteWidth + margin * 2);
             sprite.vx = hitSprite.vx;
           }
           if (pixi.moveDirection === 4) {
-            sprite.x = hitSprite.x - pixi.spriteWidth - margin * 2;
+            sprite.x = strip(hitSprite.x - pixi.spriteWidth - margin * 2);
             sprite.vx = hitSprite.vx;
           }
           if (pixi.moveDirection === 8) {
-            sprite.y = hitSprite.y + pixi.spriteWidth + margin * 2;
+            sprite.y = strip(hitSprite.y + pixi.spriteWidth + margin * 2);
             sprite.vy = hitSprite.vy;
           }
           if (pixi.moveDirection === 16) {
-            sprite.y = hitSprite.y - pixi.spriteWidth - margin * 2;
+            sprite.y = strip(hitSprite.y - pixi.spriteWidth - margin * 2);
             sprite.vy = hitSprite.vy;
           }
         }
@@ -228,6 +238,7 @@ function play () {
     }
   });
   pixi.mergeSprites.forEach(merge => {
+
     hitMerge(merge.s1, merge.s2);
   });
   pixi.mergeSprites = [];
@@ -235,25 +246,39 @@ function play () {
 function initRandomSprite () {
   if (pixi.isInitRandomSprite) return;
   pixi.isInitRandomSprite = true;
-  let index = randomInt(0, dimension * dimension)
-  console.log(index);
-  const isRepeat = checkIsRepeat(index);
-  if (isRepeat) {
-    index += 1;
-    index = index % 16;
-    checkIsRepeat(index);
-  }
+  let index = randomInt(0, dimension * dimension - 1)
+  pixi.randomSpriteIndex = index;
+
+  index = getOnlyRandomIndex(index);
+  console.log(`random int: ${index}`);
   pixi.drawRectSprite({...transform(index), value: 2})
   pixi.sprites.forEach(s => {
     console.log(`x:${s.x},y:${s.y},value:${s.value}`);
   });
 }
+
+function getOnlyRandomIndex(index) {
+  const isRepeat = checkIsRepeat(index);
+  if (isRepeat) {
+    index += 1;
+    index = index % (dimension * dimension - 1);
+    if (pixi.randomSpriteIndex === index) {
+      // game over
+      alert('game over');
+      return false;
+    }
+    return getOnlyRandomIndex(index);
+  }
+  return index;
+}
+
 function checkIsRepeat(index) {
   const {x, y} = transform(index);
   // judge is repeat
-  const spriteX = margin + (pixi.spriteWidth + 2 * margin) * x;
-  const spriteY = margin + (pixi.spriteWidth + 2 * margin) * y;
-  return pixi.sprites.find(sprite => sprite.x === spriteX && sprite.y === spriteY);
+  const spriteX = strip(margin + (pixi.spriteWidth + 2 * margin) * x);
+  const spriteY = strip(margin + (pixi.spriteWidth + 2 * margin) * y);
+  console.warn(`坐标：${spriteX} : ${spriteY}`);
+  return pixi.sprites.find(sprite => Math.abs(sprite.x - spriteX) < 1 && Math.abs(sprite.y - spriteY) < 1);
 
 }
 
@@ -275,7 +300,8 @@ function moveSprite (direction) {
   pixi.isInitRandomSprite = false;
   pixi.moveDirection = direction;
   pixi.moveSteps.push = direction;
-  pixi.sprites.forEach(s => s.isNew = false)
+  pixi.sprites.forEach(s => s.isNew = false);
+  console.log(`方向：${direction}`);
   if (
     (pixi.isReserve && (direction === 2 || direction === 8)) ||
     (!pixi.isReserve && (direction === 4 || direction === 16))
@@ -305,9 +331,15 @@ function moveSprite (direction) {
 function hitMerge(s1, s2) {
   // s1 is the current sprite
   // s2 is the hit sprite
+
+  console.log(app.stage.children.filter(c => c.isSprite))
   setupSprite({x: s1.x, y: s1.y, value: s1.value * 2, v: {vx:s1.vx, vy:s1.vy}});
+  s1.visible = false;
   app.stage.removeChild(s1);
+  // let a = setInterval(() => {clearInterval(a)}, 500);
+  s2.visible = false;
   app.stage.removeChild(s2);
+  console.log(app.stage.children.filter(c => c.isSprite))
 
   pixi.sprites.splice(pixi.sprites.findIndex(sprite =>
       sprite.x === s1.x && sprite.y === s1.y

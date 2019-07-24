@@ -27,18 +27,20 @@ function start (touch){
   // initPieces();
   // initPieces();
   // initPieces();
-  initPieces();
-  // initPiecesByMe(0);
+  // initPieces();
+  initPiecesByMe(0, 8);
   // initPiecesByMe(1);
   // initPiecesByMe(2);
-  // initPiecesByMe(3);
+  initPiecesByMe(3, 2);
   // initPiecesByMe(4);
-  // initPiecesByMe(10);
+  initPiecesByMe(5, 2);
+  // initPiecesByMe(9);
+  initPiecesByMe(10, 2);
   // initPiecesByMe(11);
   // initPiecesByMe(12);
   // initPiecesByMe(13);
   // initPiecesByMe(14);
-  // initPiecesByMe(15);
+  initPiecesByMe(15, 2);
   // initPiecesByMe(16);
   // initPiecesByMe(17);
   // initPiecesByMe(18);
@@ -62,10 +64,10 @@ function initPieces() {
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-function initPiecesByMe(index) {
+function initPiecesByMe(index, value = 2) {
   data.chess.splice(index, 1, {piece: 2, index});
 
-  pixi.drawRectSprite({...transform(index), value: 2});
+  pixi.drawRectSprite({...transform(index), value});
 }
 
 function restart () {
