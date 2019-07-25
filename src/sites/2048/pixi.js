@@ -21,18 +21,19 @@ const pixi = {
   isMoving: false,
   moveSprite,
   initView,
-  drawRect,
+  drawRectView,
   drawRectSprite,
-  removeSprite,
   sprites: [],
   mergeSprites: [],
   textures: [],
   moveDirection: 0,
   moveSteps: [],
+  rectContainer: null, //for rect container
+  spriteContainer: null, //for sprite container
   isReserve: false//精灵顺序是否反序
 }
+
 export default pixi;
-window.app = app;
 window.pixi = pixi;
 
 function initSize (n) {
