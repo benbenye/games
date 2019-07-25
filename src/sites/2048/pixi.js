@@ -12,6 +12,7 @@ let app = new PIXI.Application({
   height: viewWidth
 });
 const pixi = {
+  isInitRandomSprite: false,
   spriteWidth: strip(viewWidth / dimension - 2 * margin),
   speed: 20,
   left: keyboard(37),
@@ -36,13 +37,17 @@ const pixi = {
 export default pixi;
 window.pixi = pixi;
 
-function initSize (n) {
+function initData (n) {
   viewWidth = window.innerWidth * 0.8;
   dimension = n;
   pixi.spriteWidth = strip(viewWidth / dimension - 2 * margin);
+  pixi.isInitRandomSprite = false;
+  pixi.isReserve = false;
+  pixi.moveSteps = [];
+  pixi.moveDirection = 0;
 }
 function initView (n, start) {
-  initSize(n);
+  initData(n);
   app = new PIXI.Application({
     width: viewWidth,
     height: viewWidth

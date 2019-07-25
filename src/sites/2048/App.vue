@@ -31,7 +31,7 @@ export default {
   },
   methods: {
     restart() {
-      data.restart();
+      data.init(this.dimension, TouchDirection(this.box));
     },
     rebuild() {
       data.init(this.dimension);

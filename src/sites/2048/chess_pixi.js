@@ -29,7 +29,7 @@ function start (touch){
   initPiecesByMe(0, 8);
   // initPiecesByMe(1);
   // initPiecesByMe(2);
-  initPiecesByMe(3, 2);
+  // initPiecesByMe(3, 2);
   // initPiecesByMe(4);
   initPiecesByMe(5, 2);
   // initPiecesByMe(9);
