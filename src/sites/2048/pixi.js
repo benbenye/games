@@ -180,8 +180,6 @@ function play () {
   pixi.sprites.forEach((sprite, i) => {
     sprite.x += sprite.vx;
     sprite.y += sprite.vy;
-    // console.log(sprite.x)
-    // console.log(sprite.y)
     let hitSprite = null;
     if (pixi.moveDirection === 2) {
       hitSprite = findLeftHitSprite(sprite.x, sprite.y);
@@ -201,8 +199,10 @@ function play () {
           sprite.value === hitSprite.value &&
           !hitSprite.isNew &&
           !sprite.isNew &&
-          (!hitSprite.vx || !hitSprite.vy)
+          ((sprite.vx && !hitSprite.vx) || (sprite.vy && !hitSprite.vy))
           ) {
+            console.log(`will be push in hitMerge arr s1:${sprite.aid}, x: ${sprite.x}, y: ${sprite.y}, value: ${sprite.value}, vx: ${sprite.vx}, vy: ${sprite.vy}`);
+            console.log(`will be push in hitMerge arr s2:${hitSprite.aid}, x: ${hitSprite.x}, y: ${hitSprite.y}, value: ${hitSprite.value}, vx: ${hitSprite.vx}, vy: ${hitSprite.vy}`);
             sprite.hasHitSprite = true;
             pixi.mergeSprites.push({s1: sprite, s2: hitSprite});
         }else {
@@ -245,11 +245,13 @@ function play () {
     }
   });
   pixi.mergeSprites.forEach(merge => {
-
+    console.log(`foreach hitMerge arr s1:${merge.s1.aid}, x: ${merge.s1.x}, y: ${merge.s1.y}, value: ${merge.s1.value}`);
+    console.log(`foreach hitMerge arr s2:${merge.s2.aid}, x: ${merge.s2.x}, y: ${merge.s2.y}, value: ${merge.s2.value}`);
     hitMerge(merge.s1, merge.s2);
   });
   pixi.mergeSprites = [];
 }
+
 function initRandomSprite () {
   if (pixi.isInitRandomSprite) return;
   pixi.isInitRandomSprite = true;
