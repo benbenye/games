@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import * as PIXI from 'pixi.js'
+import {hitTestRectangle, keyboard, randomInt, strip, transform} from './pixi-util.js';
 import logo from '../../assets/logo.png';
 import number from './assets/number.png';
 
@@ -10,13 +11,9 @@ let app = new PIXI.Application({
   width: viewWidth,
   height: viewWidth
 });
-function strip(num, precision = 12) {
-  const w = +parseFloat(num.toPrecision(precision));
-  return w;
-}
 const pixi = {
   spriteWidth: strip(viewWidth / dimension - 2 * margin),
-  speed: 50,
+  speed: 20,
   left: keyboard(37),
   up: keyboard(38),
   right: keyboard(39),
@@ -68,6 +65,16 @@ function initView (n, start) {
 
 function createIdTexture () {
   pixi.textures = app.loader.resources['numberJson'].textures;
+}
+
+function drawRectView (chess) {
+  chess.forEach((e, index) => {
+    drawRect(transform(index, dimension));
+  });
+  app.stage.addChild(pixi.rectContainer);
+  app.stage.addChild(pixi.spriteContainer);
+  pixi.sprites = app.stage.children[1].children;
+  window.sprites = app.stage.children[1];
 }
 
 function drawRect ({x, y}) {
@@ -250,11 +257,7 @@ function initRandomSprite () {
   pixi.randomSpriteIndex = index;
 
   index = getOnlyRandomIndex(index);
-  console.log(`random int: ${index}`);
-  pixi.drawRectSprite({...transform(index), value: 2})
-  pixi.sprites.forEach(s => {
-    console.log(`x:${s.x},y:${s.y},value:${s.value}`);
-  });
+  pixi.drawRectSprite({...transform(index, dimension), value: 2})
 }
 
 function getOnlyRandomIndex(index) {
@@ -273,40 +276,25 @@ function getOnlyRandomIndex(index) {
 }
 
 function checkIsRepeat(index) {
-  const {x, y} = transform(index);
+  const {x, y} = transform(index, dimension);
   // judge is repeat
   const spriteX = strip(margin + (pixi.spriteWidth + 2 * margin) * x);
   const spriteY = strip(margin + (pixi.spriteWidth + 2 * margin) * y);
-  console.warn(`坐标：${spriteX} : ${spriteY}`);
   return pixi.sprites.find(sprite => Math.abs(sprite.x - spriteX) < 1 && Math.abs(sprite.y - spriteY) < 1);
 
-}
-
-function transform (num) {
-  return {
-    y: _.floor(num / dimension),
-    x: num % dimension
-  };
-}
-
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-function removeSprite () {
-  app.stage.removeChild(pixi.sprites[0])
 }
 
 function moveSprite (direction) {
   pixi.isInitRandomSprite = false;
   pixi.moveDirection = direction;
-  pixi.moveSteps.push = direction;
+  pixi.moveSteps.push(direction);
   pixi.sprites.forEach(s => s.isNew = false);
-  console.log(`方向：${direction}`);
+  console.warn(`方向：${direction}`);
   if (
     (pixi.isReserve && (direction === 2 || direction === 8)) ||
     (!pixi.isReserve && (direction === 4 || direction === 16))
     ) {
-      pixi.sprites = pixi.sprites.reverse();
+      pixi.sprites.reverse();
       pixi.isReserve = true;
     } else {
       pixi.isReserve = false;
@@ -331,88 +319,13 @@ function moveSprite (direction) {
 function hitMerge(s1, s2) {
   // s1 is the current sprite
   // s2 is the hit sprite
-
-  console.log(app.stage.children.filter(c => c.isSprite))
+  console.log(`hitMerge-s1: aid: ${s1.aid}, x: ${s1.x}, y: ${s1.y}, value: ${s1.value}`)
+  console.log(`hitMerge-s2: aid: ${s2.aid}, x: ${s2.x}, y: ${s2.y}, value: ${s2.value}`)
   setupSprite({x: s1.x, y: s1.y, value: s1.value * 2, v: {vx:s1.vx, vy:s1.vy}});
   s1.visible = false;
-  app.stage.removeChild(s1);
-  // let a = setInterval(() => {clearInterval(a)}, 500);
   s2.visible = false;
-  app.stage.removeChild(s2);
-  console.log(app.stage.children.filter(c => c.isSprite))
-
-  pixi.sprites.splice(pixi.sprites.findIndex(sprite =>
-      sprite.x === s1.x && sprite.y === s1.y
-  ), 1);
-  pixi.sprites.splice(pixi.sprites.findIndex(sprite =>
-      sprite.x === s2.x && sprite.y === s2.y
-  ), 1);
+  let aid1 = app.stage.children[1].removeChild(s1)
+  console.log(`removeChild-s1: aid: ${aid1 && aid1.aid}`);
+  let aid2 = app.stage.children[1].removeChild(s2)
+  console.log(`removeChild-s2: aid: ${aid2 && aid2.aid}`);
 }
-
-function keyboard(keyCode) {
-  let key = {};
-  key.code = keyCode;
-  key.release = undefined;
-
-  key.upHandler = event => {
-    if (event.keyCode === key.code) {
-      if (key.release) key.release();
-    }
-    event.preventDefault();
-  };
-
-  window.addEventListener(
-    "keyup", key.upHandler.bind(key), false
-  );
-  return key;
-}
-function hitTestRectangle(r1, r2) {
-
-  //Define the variables we'll need to calculate
-  let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
-
-  //hit will determine whether there's a collision
-  hit = false;
-
-  //Find the center points of each sprite
-  r1.centerX = r1.x + r1.width / 2;
-  r1.centerY = r1.y + r1.height / 2;
-  r2.centerX = r2.x + r2.width / 2;
-  r2.centerY = r2.y + r2.height / 2;
-
-  //Find the half-widths and half-heights of each sprite
-  r1.halfWidth = r1.width / 2;
-  r1.halfHeight = r1.height / 2;
-  r2.halfWidth = r2.width / 2;
-  r2.halfHeight = r2.height / 2;
-
-  //Calculate the distance vector between the sprites
-  vx = r1.centerX - r2.centerX;
-  vy = r1.centerY - r2.centerY;
-
-  //Figure out the combined half-widths and half-heights
-  combinedHalfWidths = r1.halfWidth + r2.halfWidth;
-  combinedHalfHeights = r1.halfHeight + r2.halfHeight;
-
-  //Check for a collision on the x axis
-  if (Math.abs(vx) < combinedHalfWidths) {
-
-    //A collision might be occuring. Check for a collision on the y axis
-    if (Math.abs(vy) < combinedHalfHeights) {
-
-      //There's definitely a collision happening
-      hit = true;
-    } else {
-
-      //There's no collision on the y axis
-      hit = false;
-    }
-  } else {
-
-    //There's no collision on the x axis
-    hit = false;
-  }
-
-  //`hit` will be either `true` or `false`
-  return hit;
-};

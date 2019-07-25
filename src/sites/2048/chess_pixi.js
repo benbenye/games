@@ -20,9 +20,7 @@ function init (n = 4, touch) {
   });
 }
 function start (touch){
-  data.chess.forEach(({piece}, index) => {
-    pixi.drawRect(transform(index))
-  })
+  pixi.drawRectView(data.chess);
   // initPieces();
   // initPieces();
   // initPieces();
