@@ -50,10 +50,7 @@ function start (touch){
 
 function initChess () {
   const n = data.dimension;
-  data.chess = _.zipWith(
-    _.fill(Array(n * n), 0, 0, n * n),
-    _.range(n * n),
-    (piece, index) => ({piece, index}));
+  data.chess = _.fill(Array(n * n), 0, 0, n * n)
 }
 
 function initPieces() {
