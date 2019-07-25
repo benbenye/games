@@ -101,9 +101,8 @@ function drawRectSprite ({x, y, value}) {
   });
 }
 
-function setupSprite ({x, y, value, v = {vx:0,vy:0}}) {
+function setupSprite ({x, y, value, v = {vx: 0, vy: 0}}) {
   let sprite2 = new PIXI.Sprite(pixi.textures[`n${value}.png`]);
-  // let container = new PIXI.Container();
   sprite2.x = strip(x);
   sprite2.vx = v.vx;
   sprite2.vy = v.vy;
