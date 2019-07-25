@@ -54,6 +54,9 @@ function initView (n, start) {
   app.renderer.view.style.margin = 0;
   app.renderer.view.style.padding = 0;
 
+  pixi.rectContainer = new PIXI.Container();
+  pixi.spriteContainer = new PIXI.Container();
+
   app.loader
     .add([logo, number, {name: 'numberJson', url: '/img/2048/number.json'}])
     .on('progress', loadProgressHandler)
@@ -85,8 +88,9 @@ function drawRect ({x, y}) {
   rectangle.beginFill(0xCCC0B3);
   rectangle.drawRoundedRect(spriteX, spriteY, pixi.spriteWidth, pixi.spriteWidth, 5);
   rectangle.endFill();
-  app.stage.addChild(rectangle)
+  pixi.rectContainer.addChild(rectangle);
 }
+
 function drawRectSprite ({x, y, value}) {
   const spriteX = strip(margin + (pixi.spriteWidth + 2 * margin) * x);
   const spriteY = strip(margin + (pixi.spriteWidth + 2 * margin) * y);
@@ -108,13 +112,9 @@ function setupSprite ({x, y, value, v = {vx:0,vy:0}}) {
   sprite2.isNew = true;
   sprite2.width = pixi.spriteWidth;
   sprite2.height = pixi.spriteWidth;
-  // if (v.vx || v.vy) {
-  //   console.log('spliceS1')
-  //   pixi.sprites.splice(pixi.sprites.findIndex(s => s.x === sprite2.x && s.y === sprite2.y), 0, sprite2);
-  // }
-  // container.addChild(sprite2);
-  pixi.sprites.push(sprite2);
-  app.stage.addChild(sprite2);
+  sprite2.aid = _.uniqueId();
+
+  pixi.spriteContainer.addChild(sprite2);
 }
 
 function loadProgressHandler (loader, resources) {
