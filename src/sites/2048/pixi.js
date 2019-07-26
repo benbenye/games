@@ -177,12 +177,19 @@ function play () {
     return sprite.vx === 0 && sprite.vy === 0
   })) {
     // nothing can be moved
+    if (!pixi.sprites.every(sprite => {
+      return Math.abs(sprite.x - sprite.x1) < 1 && Math.abs(sprite.y - sprite.y1) < 1
+    })) {
+      // one step is over
+      initRandomSprite();
+    }
 
-    // one step is over
-    initRandomSprite();
   }
   const right = strip(viewWidth - pixi.spriteWidth - margin);
   pixi.sprites.forEach((sprite, i) => {
+    sprite.x1 = sprite.x;
+    sprite.y1 = sprite.y;
+
     sprite.x += sprite.vx;
     sprite.y += sprite.vy;
     let hitSprite = null;
