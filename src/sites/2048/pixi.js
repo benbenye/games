@@ -182,6 +182,9 @@ function play () {
     })) {
       // one step is over
       initRandomSprite();
+      if (isGameOver()) {
+        console.log('over')
+      }
     }
 
   }
@@ -267,15 +270,19 @@ function play () {
 function initRandomSprite () {
   if (pixi.isInitRandomSprite) return;
   pixi.isInitRandomSprite = true;
-  let index = randomInt(0, dimension * dimension - 1)
+  console.log(`数组长度：${pixi.sprites.length}`)
+  let index = randomInt(0, dimension * dimension - 1);
   pixi.randomSpriteIndex = index;
+  console.log(`初始随机位置：${index}`)
 
   index = getOnlyRandomIndex(index);
-  pixi.drawRectSprite({...transform(index, dimension), value: 2})
+  console.log(`去重后随机位置：${index}`)
+  pixi.drawRectSprite({...transform(index, dimension), value: 2});
 }
 
 function getOnlyRandomIndex(index) {
   const isRepeat = checkIsRepeat(index);
+  console.log(`是否位置重叠：${isRepeat}`);
   if (isRepeat) {
     index += 1;
     index = index % (dimension * dimension);
@@ -286,11 +293,36 @@ function getOnlyRandomIndex(index) {
 
 function checkIsRepeat(index) {
   const {x, y} = transform(index, dimension);
+  console.log(`随机位置对应的x：${x}, y: ${y}`)
   // judge is repeat
   const spriteX = strip(margin + (pixi.spriteWidth + 2 * margin) * x);
   const spriteY = strip(margin + (pixi.spriteWidth + 2 * margin) * y);
   return pixi.sprites.find(sprite => Math.abs(sprite.x - spriteX) < 1 && Math.abs(sprite.y - spriteY) < 1);
 
+}
+
+function isGameOver () {
+  if (pixi.sprites.length === dimension * dimension) {
+    // chess is full
+    let sortedSprites = _.sortBy(pixi.sprites, ['y', 'x']);
+    let canBeMerged = sortedSprites.find((sprite, i) => {
+      if (sortedSprites[i+1]) {
+        return sprite.y === sortedSprites[i+1].y && sprite.value === sortedSprites[i+1].value
+      }
+      return false;
+    });
+    if (!canBeMerged) {
+      sortedSprites = _.sortBy(pixi.sprites, ['x', 'y']);
+      canBeMerged = sortedSprites.find((sprite, i) => {
+        if (sortedSprites[i+1]) {
+          return sprite.x === sortedSprites[i+1].x && sprite.value === sortedSprites[i+1].value
+        }
+        return false;
+      });
+    }
+    return !canBeMerged;
+  }
+  return false;
 }
 
 function moveSprite (direction) {
