@@ -278,12 +278,7 @@ function getOnlyRandomIndex(index) {
   const isRepeat = checkIsRepeat(index);
   if (isRepeat) {
     index += 1;
-    index = index % (dimension * dimension - 1);
-    if (pixi.randomSpriteIndex === index) {
-      // game over
-      alert('game over');
-      return false;
-    }
+    index = index % (dimension * dimension);
     return getOnlyRandomIndex(index);
   }
   return index;
