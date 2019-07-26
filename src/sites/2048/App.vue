@@ -1,40 +1,40 @@
 <template>
-  <div id="app">
-    <div class="name">2048</div>
-    <input class="dimension" type="number" v-model="dimension" />
-    <div class="btn" @click="rebuild">dimension</div>
-    <div class="btn" @click="restart">restart</div>
+  <game-over v-if="data.isGameOver"></game-over>
+  <div v-else id="app">
+    <div class="content">
+      <div class="name">2048</div>
+      <div class="menu">
+        <input class="dimension" type="number" v-model="data.dimension" />
+        <div class="btn" @click="restart">new game</div>
+      </div>
+    </div>
     <div id="box" class="box" ref="box">
       <div id="pixi"></div>
-      <!-- <piece-number v-for="(piece, index) in data.chess" :key="index" :n="piece.piece" /> -->
     </div>
   </div>
 </template>
 
 <script>
 import {TouchDirection} from './touch';
-import {data} from './chess_pixi';
-import PieceNumber from './components/number.vue';
+import pixi from './pixi';
+import data from './pixi-store';
+import GameOver from './components/gameover.vue';
 
 export default {
   name: 'Games-2048',
-  components: {PieceNumber},
+  components: {GameOver},
   data() {
     return {
-      data,
-      dimension: 5
+      data
     }
   },
   mounted() {
     this.box = this.$refs.box;
-    data.init(this.dimension, TouchDirection(this.box));
+    pixi.initView();
   },
   methods: {
     restart() {
-      data.init(this.dimension, TouchDirection(this.box));
-    },
-    rebuild() {
-      data.init(this.dimension);
+      pixi.initView();
     }
   }
 };
@@ -47,28 +47,47 @@ export default {
 <style lang="scss" scoped>
 @import '~@/assets/style/util.scss';
 #app {
-  // width: 80%;
-  margin-left: auto;
-  margin-right: auto;
-}
-.name {
-  color: #776e65;
-  font-size: px2rem(100);
-  font-weight: 900;
-}
-.box {
-  background-color: #bbada0;
-  margin-top: px2rem(50);
-  canvas {
-    margin: 6px;
+  .content {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: space-between;
+    .name {
+      color: #776e65;
+      font-size: px2rem(150);
+      font-weight: 900;
+    }
+    .menu {
+      .dimension {
+        width: px2rem(180);
+        line-height: 2;
+        font-size: px2rem(30);
+        background-color: #bbada0;
+        padding: px2rem(12);
+        outline: none;
+        border: none;
+      }
+      .btn {
+        font-size: px2rem(30);
+        background-color: #413e35;
+        display: inline-block;
+        color: #fff;
+        margin-left: 30px;
+        padding: px2rem(20);
+        border-radius: 5px;
+      }
+    }
   }
-}
-.btn {
-  background-color: #413e35;
-  display: inline-block;
-  color: #fff;
-  margin-left: 30px;
-  padding: px2rem(20);
-  border-radius: 5px;
+  .box {
+    background-color: #bbada0;
+    margin: px2rem(50) auto;
+    width: 90%;
+    border: 6px solid #bbada0;
+    border-radius: px2rem(40);
+    canvas {
+      vertical-align: top;
+    }
+  }
 }
 </style>

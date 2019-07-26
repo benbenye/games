@@ -1,53 +1,56 @@
 import _ from 'lodash';
 import * as PIXI from 'pixi.js'
-import {hitTestRectangle, keyboard, randomInt, strip, transform} from './pixi-util.js';
-import logo from '../../assets/logo.png';
-import number from './assets/number.png';
+import {TouchDirection} from './touch';
+import store from './pixi-store';
+import {hitTestRectangle, keyboard, randomInt, strip, transform} from './pixi-util';
 
-let viewWidth = window.innerWidth * 0.8;
-let dimension = 6;
-let margin = 6;
+let viewWidth = window.innerWidth * 0.9;
+let {dimension, margin, speed} = store;
 let app = new PIXI.Application({
   width: viewWidth,
   height: viewWidth
 });
 const pixi = {
   isInitRandomSprite: false,
-  spriteWidth: strip(viewWidth / dimension - 2 * margin),
-  speed: 20,
-  left: keyboard(37),
-  up: keyboard(38),
-  right: keyboard(39),
-  down: keyboard(40),
   isMoving: false,
-  moveSprite,
-  initView,
-  drawRectView,
-  drawRectSprite,
+  spriteWidth: strip(viewWidth / dimension - 2 * margin),
+  probability: 90,
   sprites: [],
   mergeSprites: [],
   textures: [],
+  chessBgStage: [], // for stage bg view
   moveDirection: 0,
   moveSteps: [],
   rectContainer: null, //for rect container
   spriteContainer: null, //for sprite container
-  isReserve: false//精灵顺序是否反序
-}
+  isReserve: false, // sprites is revers
+  left: keyboard(37),
+  up: keyboard(38),
+  right: keyboard(39),
+  down: keyboard(40),
+  moveSprite,
+  initView,
+  drawRectSprite
+};
 
-export default pixi;
-window.pixi = pixi;
+export default {
+  initView
+};
 
-function initData (n) {
-  viewWidth = window.innerWidth * 0.8;
-  dimension = n;
-  pixi.spriteWidth = strip(viewWidth / dimension - 2 * margin);
+function initData () {
+  viewWidth = window.innerWidth * 0.9;
+  let n = dimension;
+  pixi.spriteWidth = strip(viewWidth / n - 2 * margin);
   pixi.isInitRandomSprite = false;
   pixi.isReserve = false;
   pixi.moveSteps = [];
   pixi.moveDirection = 0;
+
+  pixi.chessBgStage = _.fill(Array(n * n), 0, 0, n * n);
 }
-function initView (n, start) {
-  initData(n);
+function initView () {
+  initData();
+
   app = new PIXI.Application({
     width: viewWidth,
     height: viewWidth
@@ -63,13 +66,22 @@ function initView (n, start) {
   pixi.spriteContainer = new PIXI.Container();
 
   app.loader
-    .add([logo, number, {name: 'numberJson', url: '/img/2048/number.json'}])
+    .add([{name: 'numberJson', url: '/img/2048/number.json'}])
     .on('progress', loadProgressHandler)
     .load(() => {
       createIdTexture();
-      start();
+      gameStart();
       app.ticker.add(play);
     });
+}
+
+function gameStart() {
+  drawRectView(pixi.chessBgStage);
+  moveHandler();
+
+  initRandomSprite();
+  pixi.isInitRandomSprite = false;
+  initRandomSprite();
 }
 
 function createIdTexture () {
@@ -91,7 +103,7 @@ function drawRect ({x, y}) {
   const spriteX = strip(margin + (pixi.spriteWidth + 2 * margin) * x);
   const spriteY = strip(margin + (pixi.spriteWidth + 2 * margin) * y);
   rectangle.beginFill(0xCCC0B3);
-  rectangle.drawRoundedRect(spriteX, spriteY, pixi.spriteWidth, pixi.spriteWidth, 5);
+  rectangle.drawRoundedRect(spriteX, spriteY, pixi.spriteWidth, pixi.spriteWidth, 20);
   rectangle.endFill();
   pixi.rectContainer.addChild(rectangle);
 }
@@ -271,14 +283,17 @@ function initRandomSprite () {
   if (pixi.isInitRandomSprite) return;
   pixi.isInitRandomSprite = true;
   console.log(`数组长度：${pixi.sprites.length}`)
+
   let index = randomInt(0, dimension * dimension - 1);
   pixi.randomSpriteIndex = index;
   console.log(`初始随机位置：${index}`)
 
   index = getOnlyRandomIndex(index);
   console.log(`去重后随机位置：${index}`)
-  pixi.drawRectSprite({...transform(index, dimension), value: 2});
+  let randomNum = randomInt(0, 100) > pixi.probability ? 4 : 2;
+  pixi.drawRectSprite({...transform(index, dimension), value: randomNum});
 }
+
 
 function getOnlyRandomIndex(index) {
   const isRepeat = checkIsRepeat(index);
@@ -343,16 +358,16 @@ function moveSprite (direction) {
   pixi.sprites.forEach(sprite => {
     sprite.isNew = false;
     if (direction === 2) {
-      sprite.vx = -pixi.speed;
+      sprite.vx = -speed;
     }
     if (direction === 4) {
-      sprite.vx = pixi.speed;
+      sprite.vx = speed;
     }
     if (direction === 8) {
-      sprite.vy = -pixi.speed;
+      sprite.vy = -speed;
     }
     if (direction === 16) {
-      sprite.vy = pixi.speed;
+      sprite.vy = speed;
     }
   });
 }
@@ -370,3 +385,24 @@ function hitMerge(s1, s2) {
   let aid2 = app.stage.children[1].removeChild(s2)
   console.log(`removeChild-s2: aid: ${aid2 && aid2.aid}`);
 }
+
+function moveHandler (touch) {
+  TouchDirection(document.getElementById('pixi'))
+    .on('swipe', (e) => {
+      moveSprite(e.offsetDirection);
+    });
+
+  pixi.left.release = () => {
+    moveSprite(2);
+  };
+  pixi.right.release = () => {
+    moveSprite(4);
+  };
+  pixi.down.release = () => {
+    moveSprite(16);
+  };
+  pixi.up.release = () => {
+    moveSprite(8);
+  };
+}
+
