@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import * as PIXI from 'pixi.js'
 import {TouchDirection} from './touch';
-import store from './pixi-store';
+import store, {initStore} from './pixi-store';
 import {hitTestRectangle, keyboard, randomInt, strip, transform} from './pixi-util';
 
-let viewWidth = window.innerWidth * 0.9;
 let {dimension, margin, speed} = store;
+let viewWidth = 0;
 let app = new PIXI.Application({
   width: viewWidth,
   height: viewWidth
@@ -36,9 +36,10 @@ const pixi = {
 export default {
   initView
 };
-
+window.pixi = pixi;
 function initData () {
-  viewWidth = window.innerWidth * 0.9;
+  initStore();
+  viewWidth = store.width * 0.9;
   let n = dimension;
   pixi.spriteWidth = strip(viewWidth / n - 2 * margin);
   pixi.isInitRandomSprite = false;
@@ -61,6 +62,8 @@ function initView () {
   app.renderer.backgroundColor = 0xBBADA0;
   app.renderer.view.style.margin = 0;
   app.renderer.view.style.padding = 0;
+  app.renderer.view.style.verticalAlign = 'top';
+  app.renderer.view.style.borderRadius = '50px';
 
   pixi.rectContainer = new PIXI.Container();
   pixi.spriteContainer = new PIXI.Container();
@@ -95,7 +98,6 @@ function drawRectView (chess) {
   app.stage.addChild(pixi.rectContainer);
   app.stage.addChild(pixi.spriteContainer);
   pixi.sprites = app.stage.children[1].children;
-  window.sprites = app.stage.children[1];
 }
 
 function drawRect ({x, y}) {
@@ -188,6 +190,7 @@ function play () {
   if (pixi.sprites.every(sprite => {
     return sprite.vx === 0 && sprite.vy === 0
   })) {
+    pixi.isMoving = false;
     // nothing can be moved
     if (!pixi.sprites.every(sprite => {
       return Math.abs(sprite.x - sprite.x1) < 1 && Math.abs(sprite.y - sprite.y1) < 1
@@ -195,7 +198,7 @@ function play () {
       // one step is over
       initRandomSprite();
       if (isGameOver()) {
-        console.log('over')
+        store.isGameOver = true;
       }
     }
 
@@ -341,6 +344,8 @@ function isGameOver () {
 }
 
 function moveSprite (direction) {
+  if (pixi.isMoving) return;
+  pixi.isMoving = true;
   pixi.isInitRandomSprite = false;
   pixi.moveDirection = direction;
   pixi.moveSteps.push(direction);
