@@ -42,6 +42,8 @@ function initData () {
   viewWidth = store.width * 0.9;
   let n = dimension;
   pixi.spriteWidth = strip(viewWidth / n - 2 * margin);
+  // use the fastest speed
+  store.speed = strip(pixi.spriteWidth + store.margin);
   pixi.isInitRandomSprite = false;
   pixi.isReserve = false;
   pixi.moveSteps = [];
@@ -63,7 +65,6 @@ function initView () {
   app.renderer.view.style.margin = 0;
   app.renderer.view.style.padding = 0;
   app.renderer.view.style.verticalAlign = 'top';
-  app.renderer.view.style.borderRadius = '50px';
 
   pixi.rectContainer = new PIXI.Container();
   pixi.spriteContainer = new PIXI.Container();
