@@ -1,6 +1,5 @@
 <template>
-  <game-over v-if="data.isGameOver"></game-over>
-  <div v-else id="app">
+  <div id="app">
     <div class="content">
       <div class="name">2048</div>
       <div class="menu">
@@ -11,6 +10,7 @@
     <div id="box" class="box" ref="box">
       <div id="pixi"></div>
     </div>
+    <game-over v-show="data.isGameOver"></game-over>
   </div>
 </template>
 
@@ -29,11 +29,12 @@ export default {
     }
   },
   mounted() {
-    this.box = this.$refs.box;
+    data.width = document.getElementById('app').clientWidth;
     pixi.initView();
   },
   methods: {
     restart() {
+      data.width = document.getElementById('app').clientWidth;
       pixi.initView();
     }
   }
@@ -47,6 +48,9 @@ export default {
 <style lang="scss" scoped>
 @import '~@/assets/style/util.scss';
 #app {
+  // max-width: px2rem(500);
+    margin-left: auto;
+    margin-right: auto;
   .content {
     width: 90%;
     margin-left: auto;
@@ -85,9 +89,6 @@ export default {
     width: 90%;
     border: 6px solid #bbada0;
     border-radius: px2rem(40);
-    canvas {
-      vertical-align: top;
-    }
   }
 }
 </style>
