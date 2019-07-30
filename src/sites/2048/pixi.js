@@ -47,6 +47,9 @@ function initData () {
   pixi.isInitRandomSprite = false;
   pixi.isReserve = false;
   pixi.moveSteps = [];
+  pixi.sprites = [];
+  pixi.textures = [];
+  pixi.chessBgStage = [];
   pixi.moveDirection = 0;
 
   pixi.chessBgStage = _.fill(Array(n * n), 0, 0, n * n);
