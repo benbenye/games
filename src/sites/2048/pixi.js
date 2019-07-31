@@ -148,20 +148,6 @@ function loadProgressHandler (loader, resources) {
   console.log("progress: " + loader.progress + "%");
 }
 
-
-function chunk (s, d) {
-    let r = [[s[0]]];
-    for (let i = 1; i < s.length; i++) {
-      if (!s[i]) break;
-      if (_.last(_.last(r))[d] === s[i][d]) {
-        _.last(r).push(s[i]);
-        continue;
-      }
-      r.push([s[i]]);
-    }
-    return r;
-}
-
 function sortByXY (direction) {
   if (direction === 2) {
     let s = _.sortBy(pixi.sprites, ['y', 'x']);

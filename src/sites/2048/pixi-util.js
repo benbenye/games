@@ -32,6 +32,20 @@ export function transform (num, dimension) {
     x: num % dimension
   };
 }
+
+export function chunk (s, d) {
+  let r = [[s[0]]];
+  for (let i = 1; i < s.length; i++) {
+    if (!s[i]) break;
+    if (_.last(_.last(r))[d] === s[i][d]) {
+      _.last(r).push(s[i]);
+      continue;
+    }
+    r.push([s[i]]);
+  }
+  return r;
+}
+
 const easing = new BezierEasing(0.25,1,0.25,1);
 
 export function setAnimation (sprite, scaleX) {
