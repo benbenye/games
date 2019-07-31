@@ -36,7 +36,7 @@ const pixi = {
 export default {
   initView
 };
-window.pixi = pixi;
+
 function initData () {
   initStore();
   viewWidth = store.width * 0.9;
@@ -269,8 +269,7 @@ function play () {
       sprite.x += sprite.vx;
       sprite.y += sprite.vy;
     }
-  })
-
+  });
 
   pixi.mergeSprites.forEach(merge => {
     console.log(`foreach hitMerge arr s1:${merge.s1.aid}, x: ${merge.s1.x}, y: ${merge.s1.y}, value: ${merge.s1.value}`);
@@ -292,7 +291,7 @@ function initRandomSprite () {
   index = getOnlyRandomIndex(index);
   console.log(`去重后随机位置：${index}`)
   let randomNum = randomInt(0, 100) > pixi.probability ? 4 : 2;
-  pixi.drawRectSprite({...transform(index, dimension), value: randomNum});
+  drawRectSprite({...transform(index, dimension), value: randomNum});
 }
 
 function getOnlyRandomIndex(index) {
