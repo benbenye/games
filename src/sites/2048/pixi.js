@@ -44,7 +44,7 @@ function initData () {
   pixi.spriteWidth = strip(viewWidth / n - 2 * margin);
   pixi.correction = pixi.spriteWidth / 2;
   // use the fastest speed
-  // store.speed = strip(pixi.spriteWidth + store.margin);
+  store.speed = strip(pixi.spriteWidth / 5);
   pixi.isInitRandomSprite = false;
   pixi.moveSteps = [];
   pixi.sprites = [];
