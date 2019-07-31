@@ -197,8 +197,7 @@ function play () {
     return;
   }
   const right = strip(viewWidth - pixi.spriteWidth - margin);
-  const front = pixi.spriteWidth + margin;
-  const end = margin * 2 + pixi.spriteWidth * 5 / 4;
+  const operator = pixi.moveDirection === 2 || pixi.moveDirection === 8 ? 1 : -1;
 
   sortByXY(pixi.moveDirection).forEach(e => {
     for (let i = 0; i < e.length; i++) {
@@ -226,14 +225,22 @@ function play () {
       }
       let hitSprite = e[i - 1];
       if (hitSprite) {
-        let c = (
-              Math.abs(sprite.x - hitSprite.x) >= front &&
-              Math.abs(sprite.x - hitSprite.x) <= end
-            ) ||
-            (
-              Math.abs(sprite.y - hitSprite.y) >= front &&
-              Math.abs(sprite.y - hitSprite.y) <= end
-            );
+        let c = false;
+        if (pixi.moveDirection === 2) {
+          c =
+          sprite.x + sprite.vx <= hitSprite.x + (pixi.spriteWidth + margin) * operator
+        }
+        else if (pixi.moveDirection === 8) {
+          c =
+          sprite.y + sprite.vy <= hitSprite.y + (pixi.spriteWidth + margin) * operator;
+        }
+        else if (pixi.moveDirection === 4) {
+          c =
+          sprite.x + sprite.vx >= hitSprite.x + (pixi.spriteWidth + margin) * operator
+        } else {
+          c =
+          sprite.y + sprite.vy >= hitSprite.y + (pixi.spriteWidth + margin) * operator
+        }
         if (
           !hitSprite.vx && !hitSprite.vy &&
           c &&
@@ -269,7 +276,9 @@ function play () {
           // merge
             console.log(`will be push in hitMerge arr s1:${sprite.aid}, x: ${sprite.x}, y: ${sprite.y}, value: ${sprite.value}, vx: ${sprite.vx}, vy: ${sprite.vy}`);
             console.log(`will be push in hitMerge arr s2:${hitSprite.aid}, x: ${hitSprite.x}, y: ${hitSprite.y}, value: ${hitSprite.value}, vx: ${hitSprite.vx}, vy: ${hitSprite.vy}`);
-          pixi.mergeSprites.push({s1: sprite, s2: hitSprite});
+          // pixi.mergeSprites.push({s1: hitSprite, s2: sprite});
+          hitMerge(hitSprite, sprite);
+          i++;
         }
       }
 
@@ -391,16 +400,18 @@ function hitMerge(s1, s2) {
   // s2 is the hit sprite
   console.log(`hitMerge-s1: aid: ${s1.aid}, x: ${s1.x}, y: ${s1.y}, value: ${s1.value}`)
   console.log(`hitMerge-s2: aid: ${s2.aid}, x: ${s2.x}, y: ${s2.y}, value: ${s2.value}`)
-  setupSprite({x: s1.x, y: s1.y, value: s1.value * 2, v: {vx:s1.vx, vy:s1.vy}});
+  // setupSprite({x: s1.x, y: s1.y, value: s1.value * 2, v: {vx:s1.vx, vy:s1.vy}});
+  s2.value = s2.value * 2;
+  s2.isNew = true;
+  s2.texture = pixi.textures[`n${s2.value}.png`];
   s1.visible = false;
-  s2.visible = false;
   let aid1 = app.stage.children[1].removeChild(s1)
   console.log(`removeChild-s1: aid: ${aid1 && aid1.aid}`);
-  let aid2 = app.stage.children[1].removeChild(s2)
-  console.log(`removeChild-s2: aid: ${aid2 && aid2.aid}`);
+  // let aid2 = app.stage.children[1].removeChild(s2)
+  // console.log(`removeChild-s2: aid: ${aid2 && aid2.aid}`);
 }
 
-function moveHandler (touch) {
+function moveHandler () {
   TouchDirection(document.getElementById('pixi'))
     .on('swipe', (e) => {
       moveSprite(e.offsetDirection);
