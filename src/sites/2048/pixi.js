@@ -11,6 +11,7 @@ let app = new PIXI.Application({
   height: viewWidth
 });
 const pixi = {
+  correction: 0, // fix the anchor side effect
   isInitRandomSprite: false,
   isMoving: false,
   spriteWidth: strip(viewWidth / dimension - 2 * margin),
@@ -41,6 +42,7 @@ function initData () {
   viewWidth = store.width * 0.9;
   let n = dimension;
   pixi.spriteWidth = strip(viewWidth / n - 2 * margin);
+  pixi.correction = pixi.spriteWidth / 2;
   // use the fastest speed
   // store.speed = strip(pixi.spriteWidth + store.margin);
   pixi.isInitRandomSprite = false;
@@ -113,8 +115,8 @@ function drawRect ({x, y}) {
 }
 
 function drawRectSprite ({x, y, value}) {
-  const spriteX = strip(margin + (pixi.spriteWidth + 2 * margin) * x);
-  const spriteY = strip(margin + (pixi.spriteWidth + 2 * margin) * y);
+  const spriteX = strip(margin + (pixi.spriteWidth + 2 * margin) * x + pixi.correction);
+  const spriteY = strip(margin + (pixi.spriteWidth + 2 * margin) * y + pixi.correction);
   setupSprite({
     x: spriteX,
     y: spriteY,
@@ -194,15 +196,14 @@ function play () {
     }
     return;
   }
-  const right = strip(viewWidth - pixi.spriteWidth - margin);
+  const right = strip(viewWidth - pixi.spriteWidth - margin + pixi.correction);
   const operator = pixi.moveDirection === 2 || pixi.moveDirection === 8 ? 1 : -1;
-
   sortByXY(pixi.moveDirection).forEach(e => {
     for (let i = 0; i < e.length; i++) {
       let sprite = e[i];
 
-      if (pixi.moveDirection === 2 && sprite.x <= margin) {
-        sprite.x = margin;
+      if (pixi.moveDirection === 2 && sprite.x <= margin+ pixi.correction) {
+        sprite.x = margin + pixi.correction;
         sprite.vx = 0;
         continue;
       }
@@ -216,8 +217,8 @@ function play () {
         sprite.vy = 0;
         continue;
       }
-      if (pixi.moveDirection === 8 && sprite.y <= margin) {
-        sprite.y = margin;
+      if (pixi.moveDirection === 8 && sprite.y <= margin+ pixi.correction) {
+        sprite.y = margin+ pixi.correction;
         sprite.vy = 0;
         continue;
       }
@@ -226,7 +227,7 @@ function play () {
         let c = false;
         if (pixi.moveDirection === 2) {
           c =
-          sprite.x + sprite.vx <= hitSprite.x + (pixi.spriteWidth + margin) * operator
+          sprite.x + sprite.vx <= hitSprite.x + (pixi.spriteWidth + margin) * operator;
         }
         else if (pixi.moveDirection === 8) {
           c =
@@ -234,10 +235,10 @@ function play () {
         }
         else if (pixi.moveDirection === 4) {
           c =
-          sprite.x + sprite.vx >= hitSprite.x + (pixi.spriteWidth + margin) * operator
+          sprite.x + sprite.vx >= hitSprite.x + (pixi.spriteWidth + margin) * operator;
         } else {
           c =
-          sprite.y + sprite.vy >= hitSprite.y + (pixi.spriteWidth + margin) * operator
+          sprite.y + sprite.vy >= hitSprite.y + (pixi.spriteWidth + margin) * operator;
         }
         if (
           !hitSprite.vx && !hitSprite.vy &&
@@ -262,10 +263,9 @@ function play () {
           }
           continue;
         }
-        let cc = (
-          (pixi.moveDirection === 2 || pixi.moveDirection === 4) && Math.abs(hitSprite.x - sprite.x) <= speed ||
-          (pixi.moveDirection === 8 || pixi.moveDirection === 16) && Math.abs(hitSprite.y - sprite.y) <= speed
-          );
+        let cc =
+          ((pixi.moveDirection === 2 || pixi.moveDirection === 4) && Math.abs(hitSprite.x - sprite.x) <= speed) ||
+          ((pixi.moveDirection === 8 || pixi.moveDirection === 16) && Math.abs(hitSprite.y - sprite.y) <= speed);
         if (
           hitSprite.value === sprite.value &&
           cc &&
@@ -321,8 +321,8 @@ function checkIsRepeat(index) {
   const {x, y} = transform(index, dimension);
   console.log(`随机位置对应的x：${x}, y: ${y}`)
   // judge is repeat
-  const spriteX = strip(margin + (pixi.spriteWidth + 2 * margin) * x);
-  const spriteY = strip(margin + (pixi.spriteWidth + 2 * margin) * y);
+  const spriteX = strip(margin + (pixi.spriteWidth + 2 * margin) * x + pixi.correction);
+  const spriteY = strip(margin + (pixi.spriteWidth + 2 * margin) * y + pixi.correction);
   return pixi.sprites.find(sprite => Math.abs(sprite.x - spriteX) < 1 && Math.abs(sprite.y - spriteY) < 1);
 
 }
