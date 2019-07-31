@@ -2,7 +2,7 @@ import _ from 'lodash';
 import * as PIXI from 'pixi.js'
 import {TouchDirection} from './touch';
 import store, {initStore} from './pixi-store';
-import {hitTestRectangle, keyboard, randomInt, strip, transform} from './pixi-util';
+import {keyboard, randomInt, strip, transform} from './pixi-util';
 
 let {dimension, margin, speed} = store;
 let viewWidth = 0;
@@ -23,7 +23,6 @@ const pixi = {
   moveSteps: [],
   rectContainer: null, //for rect container
   spriteContainer: null, //for sprite container
-  isReserve: false, // sprites is revers
   left: keyboard(37),
   up: keyboard(38),
   right: keyboard(39),
@@ -43,9 +42,8 @@ function initData () {
   let n = dimension;
   pixi.spriteWidth = strip(viewWidth / n - 2 * margin);
   // use the fastest speed
-  store.speed = strip(pixi.spriteWidth + store.margin);
+  // store.speed = strip(pixi.spriteWidth + store.margin);
   pixi.isInitRandomSprite = false;
-  pixi.isReserve = false;
   pixi.moveSteps = [];
   pixi.sprites = [];
   pixi.textures = [];
@@ -180,9 +178,7 @@ function sortByXY (direction) {
 }
 
 function play () {
-  if (pixi.sprites.every(sprite => {
-    return sprite.vx === 0 && sprite.vy === 0
-  })) {
+  if (pixi.sprites.every(sprite => sprite.vx === 0 && sprite.vy === 0)) {
     pixi.isMoving = false;
     // nothing can be moved
     if (!pixi.sprites.every(sprite => {
@@ -311,13 +307,9 @@ function initRandomSprite () {
   pixi.drawRectSprite({...transform(index, dimension), value: randomNum});
 }
 
-
 function getOnlyRandomIndex(index) {
-  const isRepeat = checkIsRepeat(index);
-  console.log(`是否位置重叠：${isRepeat}`);
-  if (isRepeat) {
-    index += 1;
-    index = index % (dimension * dimension);
+  if (checkIsRepeat(index)) {
+    index = ++index % (dimension * dimension);
     return getOnlyRandomIndex(index);
   }
   return index;
@@ -337,24 +329,24 @@ function isGameOver () {
   if (pixi.sprites.length === dimension * dimension) {
     // chess is full
     let sortedSprites = _.sortBy(pixi.sprites, ['y', 'x']);
-    let canBeMerged = sortedSprites.find((sprite, i) => {
-      if (sortedSprites[i+1]) {
-        return sprite.y === sortedSprites[i+1].y && sprite.value === sortedSprites[i+1].value
-      }
-      return false;
-    });
+
+    let canBeMerged = findCanBeMerged(sortedSprites, 'y');
     if (!canBeMerged) {
       sortedSprites = _.sortBy(pixi.sprites, ['x', 'y']);
-      canBeMerged = sortedSprites.find((sprite, i) => {
-        if (sortedSprites[i+1]) {
-          return sprite.x === sortedSprites[i+1].x && sprite.value === sortedSprites[i+1].value
-        }
-        return false;
-      });
+      canBeMerged = findCanBeMerged(sortedSprites, 'x');
     }
     return !canBeMerged;
   }
   return false;
+}
+
+function findCanBeMerged (sortedSprites, d) {
+  return sortedSprites.find((sprite, i) => {
+    if (sortedSprites[i+1]) {
+      return sprite[d] === sortedSprites[i+1][d] && sprite.value === sortedSprites[i+1].value
+    }
+    return false;
+  });
 }
 
 function moveSprite (direction) {
@@ -365,15 +357,6 @@ function moveSprite (direction) {
   pixi.moveSteps.push(direction);
   pixi.sprites.forEach(s => s.isNew = false);
   console.warn(`方向：${direction}`);
-  if (
-    (pixi.isReserve && (direction === 2 || direction === 8)) ||
-    (!pixi.isReserve && (direction === 4 || direction === 16))
-    ) {
-      pixi.sprites.reverse();
-      pixi.isReserve = true;
-    } else {
-      pixi.isReserve = false;
-    }
   pixi.sprites.forEach(sprite => {
     sprite.isNew = false;
 
