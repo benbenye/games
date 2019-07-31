@@ -2,7 +2,7 @@ import _ from 'lodash';
 import * as PIXI from 'pixi.js'
 import {TouchDirection} from './touch';
 import store, {initStore} from './pixi-store';
-import {keyboard, randomInt, strip, transform} from './pixi-util';
+import {keyboard, randomInt, strip, transform, chunk, setAnimation} from './pixi-util';
 
 let {dimension, margin, speed} = store;
 let viewWidth = 0;
@@ -134,9 +134,11 @@ function setupSprite ({x, y, value, v = {vx: 0, vy: 0}}) {
   sprite2.isNew = true;
   sprite2.width = pixi.spriteWidth;
   sprite2.height = pixi.spriteWidth;
+  sprite2.anchor.set(0.5, 0.5);
   sprite2.aid = _.uniqueId();
 
   pixi.spriteContainer.addChild(sprite2);
+  setAnimation(sprite2, sprite2.scale.x);
 }
 
 function loadProgressHandler (loader, resources) {

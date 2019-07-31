@@ -1,3 +1,5 @@
+import BezierEasing from 'bezier-easing';
+
 export function keyboard(keyCode) {
   let key = {};
   key.code = keyCode;
@@ -29,4 +31,19 @@ export function transform (num, dimension) {
     y: _.floor(num / dimension),
     x: num % dimension
   };
+}
+const easing = new BezierEasing(0.25,1,0.25,1);
+
+export function setAnimation (sprite, scaleX) {
+  let i = scaleX * 0.2;
+
+  let o = setInterval(() => {
+    i += scaleX * 0.09;
+    sprite.scale.set(strip(easing(i)), strip(easing(i)));
+
+    if(strip(easing(i)) >= scaleX * 1.1) {
+      sprite.scale.set(scaleX, scaleX);
+      clearInterval(o);
+    }
+  }, 10);
 }
