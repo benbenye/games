@@ -29,12 +29,12 @@ export default {
     }
   },
   mounted() {
-    data.width = document.getElementById('app').clientWidth;
+    data.width = document.getElementById('box').clientWidth;
     pixi.initView();
   },
   methods: {
     restart() {
-      data.width = document.getElementById('app').clientWidth;
+      data.width = document.getElementById('box').clientWidth;
       pixi.initView();
     }
   }
@@ -48,7 +48,6 @@ export default {
 <style lang="scss" scoped>
 @import '~@/assets/style/util.scss';
 #app {
-  // max-width: px2rem(500);
     margin-left: auto;
     margin-right: auto;
   .content {
@@ -59,13 +58,11 @@ export default {
     justify-content: space-between;
     .name {
       color: #776e65;
-      font-size: px2rem(150);
       font-weight: 900;
     }
     .menu {
       .dimension {
-        width: px2rem(180);
-        line-height: 2;
+        width: px2rem(160);
         font-size: px2rem(30);
         background-color: #bbada0;
         padding: px2rem(12);
@@ -78,17 +75,53 @@ export default {
         display: inline-block;
         color: #fff;
         margin-left: 30px;
-        padding: px2rem(20);
         border-radius: 5px;
+        padding: px2rem(10);
       }
     }
   }
   .box {
-    background-color: #bbada0;
-    margin: px2rem(50) auto;
     width: 90%;
-    border: 6px solid #bbada0;
+    margin: px2rem(50) auto;
     border-radius: px2rem(40);
+    text-align: center;
+  }
+$moboleWidth: px2rem(640);
+$pcMiddleWidth: px2rem(640);
+$pcBigWidth: px2rem(350);
+
+  @media screen and (min-width:640px){
+    .content{
+      width: $pcMiddleWidth;
+      .name {
+        font-size: px2rem(50);
+      }
+    }
+    .box {
+      width: $pcMiddleWidth;
+    }
+  }
+  @media screen and (min-width:1024px){
+    .content{
+      width: $pcBigWidth;
+      .name {
+        font-size: px2rem(50);
+      }
+      .menu {
+        .dimension {
+          width: px2rem(70);
+          line-height: 1;
+          font-size: px2rem(16);
+        }
+        .btn {
+          font-size: px2rem(16);
+          padding: px2rem(10);
+        }
+      }
+    }
+    .box {
+      width: $pcBigWidth;
+    }
   }
 }
 </style>
