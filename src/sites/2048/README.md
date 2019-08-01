@@ -1,5 +1,5 @@
 ## 2048
-2048 with pixi.js, just use the sprite move && simple hit test 
+2048 with pixi.js, just use the sprite move ~~ && simple hit test ~~
 
 - [x] render with sprite png   
 Like the `learn pixi.js`, use the tool TexturePackerGUI. It can make `xx.json` and `xx.png` quickly. And with the code:   
