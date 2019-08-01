@@ -136,6 +136,7 @@ function setupSprite ({x, y, value, v = {vx: 0, vy: 0}}) {
   sprite2.y1 = sprite2.y * 2;
   sprite2.value = value;
   sprite2.isNew = true;
+  sprite2.visible = false;
   sprite2.width = pixi.spriteWidth;
   sprite2.height = pixi.spriteWidth;
   sprite2.anchor.set(0.5, 0.5);
