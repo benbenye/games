@@ -1,9 +1,9 @@
-import _ from 'lodash';
 import * as PIXI from 'pixi.js'
+import _ from 'lodash';
 import {TouchDirection} from './touch';
 import store, {initStore} from './pixi-store';
 import {keyboard, randomInt, strip, transform, chunk, setAnimation} from './pixi-util';
-
+let dpr = window.devicePixelRatio;
 let {dimension, margin, speed} = store;
 let viewWidth = 0;
 let app = new PIXI.Application({
@@ -39,7 +39,8 @@ export default {
 
 function initData () {
   initStore();
-  viewWidth = store.width * 0.9;
+  viewWidth = store.width * 0.9 * dpr;
+  margin = margin * dpr;
   let n = dimension;
   pixi.spriteWidth = strip(viewWidth / n - 2 * margin);
   pixi.correction = pixi.spriteWidth / 2;
@@ -65,9 +66,10 @@ function initView () {
 
   app.renderer.view.id = 'pixi';
   app.renderer.backgroundColor = 0xBBADA0;
-  app.renderer.view.style.margin = 0;
-  app.renderer.view.style.padding = 0;
   app.renderer.view.style.verticalAlign = 'top';
+  app.renderer.view.style.transform = `scale(${1/dpr})`;
+  app.renderer.view.style.transformOrigin = `0 0`;
+  app.renderer.view.style.border = `${margin}px solid #bbada0`;
 
   pixi.rectContainer = new PIXI.Container();
   pixi.spriteContainer = new PIXI.Container();
