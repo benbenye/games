@@ -1,5 +1,3 @@
-import BezierEasing from 'bezier-easing';
-
 export function keyboard(keyCode) {
   let key = {};
   key.code = keyCode;
