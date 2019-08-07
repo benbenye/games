@@ -4,11 +4,11 @@ const {spawn} = require('child_process');
 
 const [command, site] = process.argv.slice(2);
 
-function runSite(site) {
+function runSite(site, port) {
   let params = `src/sites/${site}/main.js`;
   if (command === 'build') params = `--dest dist/${site} ${params}`;
 
-  const cmd = `SITE=${site} vue-cli-service ${command} ${params}`;
+  const cmd = `SITE=${site} PORT=${port || 8081} vue-cli-service ${command} ${params}`;
   // eslint-disable-next-line no-console
   console.log(cmd);
   spawn(cmd, {
@@ -35,6 +35,11 @@ inquirer
       name: 'site',
       message: `Which game will you ${command}?`,
       choices: sites
+    },
+    {
+      type: 'input',
+      name: 'port',
+      message: 'Enter port:'
     }
   ])
-  .then(({site}) => runSite(site));
+  .then(({site, port}) => runSite(site, port));
