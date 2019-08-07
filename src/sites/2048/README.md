@@ -1,5 +1,5 @@
 ## 2048
-2048 with pixi.js, just use the sprite move && simple hit test 
+2048 with pixi.js, just use the sprite move ~~&& simple hit test~~
 
 - [x] render with sprite png   
 Like the `learn pixi.js`, use the tool TexturePackerGUI. It can make `xx.json` and `xx.png` quickly. And with the code:   
@@ -37,4 +37,24 @@ At first, I use the array and stage manged all sprites at the same time. While, 
 The `splice` may remove the wrong sprite with the same `x` and `y`, but `stage.removeChild` remove the right sprite.
 - [x] add the fastest speed   
 When the sprite is moving, all sprite has the same speed. But the first sprite that in the right sort array will be stop. And the next sprite has the higher speed will move forward the first sprite in one frame.   
-So the sprite's fastest speed shouldn't more than `spriteWidth` + `margin`.
+So the sprite's fastest speed shouldn't more than `spriteWidth` + `margin`.    
+- [x] use the sprite.scale   
+I want to make an animation with new sprite. And just like the title, I think about the `sprite.scale` is the prop I want.    
+At first, I think it should be 0 - 1 zoom relate sprite-self. Well, the `scale ` is relate to the picter that textured in sprite found in practice. So, I need to recored the scale value.   
+```javascript
+const easing = new BezierEasing(0.25,1,0.25,1);
+
+export function setAnimation (sprite, scaleX) {
+  let i = scaleX * 0.2;
+
+  let o = setInterval(() => {
+    i += scaleX * 0.09;
+    sprite.scale.set(strip(easing(i)), strip(easing(i)));
+
+    if(strip(easing(i)) >= scaleX * 1.1) {
+      sprite.scale.set(scaleX, scaleX);
+      clearInterval(o);
+    }
+  }, 10);
+}
+```
