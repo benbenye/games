@@ -26,7 +26,8 @@ export default {
   components: {GameOver},
   data() {
     return {
-      data
+      data,
+      pixi
     }
   },
   mounted() {
@@ -85,7 +86,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     li {
-      background-image: url(./assets/one-1.png);
+      background-image: url(./assets/one.png);
       background-size: contain;
       background-repeat: no-repeat;
       opacity: 0.3;
