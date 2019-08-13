@@ -4,15 +4,15 @@ import one from './assets/one.png';
 import store, {initStore} from './pixi-store';
 import {keyboard, randomInt, strip, transform, chunk, setAnimation, hitTestRectangle, contain} from './pixi-util';
 
-const tetris = {
-  'Z': [{x: 0, y: 0}, {x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 1}],
-  'S': [{x: 0, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}],
-  'J': [{x: 0, y: 1}, {x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}],
-  'L': [{x: 0, y: 1}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}],
-  'T': [{x: 0, y: 1}, {x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 1}],
-  'I': [{x: 0, y: 1}, {x: 3, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 1}],
-  'O': [{x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 1}]
-};
+const tetris = [
+  [{x: 0, y: 0}, {x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 1}],
+  [{x: 0, y: 1}, {x: 1, y: 1}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}],
+  [{x: 0, y: 1}, {x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}],
+  [{x: 0, y: 1}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 2}],
+  [{x: 0, y: 1}, {x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 1}],
+  [{x: 0, y: 0}, {x: 3, y: 0}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 0}],
+  [{x: 1, y: 0}, {x: 2, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 1}]
+];
 
 let app = null;
 
@@ -64,7 +64,7 @@ function loadProgressHandler (loader, resources) {
 }
 
 function gameStart () {
-  makeTetris('S');
+  makeTetris(1);
 }
 
 function play() {
@@ -78,11 +78,14 @@ function play() {
   if (hit === 'bottom') {
     removeContainer();
     checkHasOneLine();
-    makeTetris('O');
+    makeTetris(1);
   }
-  if (hit) {
-
-  game.movingContainer.vy = 0;
+  if (hit === 'hit') {
+    console.log(hit)
+    removeContainer();
+    checkHasOneLine();
+    makeTetris(1)
+    // makeTetris(randomInt(0, tetris.length - 1))
   }
 }
 
@@ -100,27 +103,30 @@ function setupSprite ({x, y}) {
   return sprite2;
 }
 
-function makeTetris (name) {
-  tetris[name].map(t => {
+function makeTetris (index = 0) {
+  tetris[index].slice(0, 4).map(t => {
     return setupSprite({
       x: t.x * game.spriteWidth,
       y: t.y * game.spriteWidth,
       v: {
         vx: 0,
         vy: 0
-      }
+      },
+      originX: _.last(tetris[index]).x,
+      originY: _.last(tetris[index]).y
     })
   }).forEach(sprite => {
     game.movingContainer.addChild(sprite);
   });
   game.movingContainer.vy = game.speed;
-  game.movingContainer.x = game.spriteWidth * 3;
+  game.movingContainer.x = strip(game.spriteWidth * 3);
   game.movingContainer.y = -game.spriteWidth;
 }
 
 function checkHasOneLine() {
 
   console.log(game.movingContainer)
+  console.log(app.stage.children)
 }
 
 function checkHit () {
