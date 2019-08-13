@@ -155,20 +155,20 @@ function checkHit () {
   let sprites = app.stage.children.filter(e => e.isSprite);
   if (sprites.length) {
     let xs = [...new Set(game.movingContainer.children.map(t => t.x + game.movingContainer.x))];
-    console.log(xs);
+    let movingSprites = xs.map(x =>
+      _.last(_.sortBy(game.movingContainer.children.filter(sprite => sprite.x + game.movingContainer.x === x), ['y']))
+    );
 
-    let allInX = sprites.filter(t => {
-      return xs.includes(t.x)
-    });
+    let allInX = sprites.filter(t =>
+      xs.find(x => Math.abs(x - t.x) < 2)
+    );
+
     if (allInX.length) {
-      let hitSprites = xs.map(x =>
-        _.first(_.sortBy(allInX.filter(sprite => sprite.x === x), ['y']))
+      let hitSprites = movingSprites.map(movingSprite =>
+         _.first(_.sortBy(allInX.filter(sprite =>
+           Math.abs(sprite.x - movingSprite.x - game.movingContainer.x) < 2), ['y']))
       );
-      let movingSprites = xs.map(x =>
-        _.last(_.sortBy(game.movingContainer.children.filter(sprite => sprite.x + game.movingContainer.x === x), ['y']))
-      );
-        console.log(hitSprites)
-        console.log(movingSprites)
+
       return hitMovingBottom(hitSprites, movingSprites);
     }
 
@@ -180,15 +180,14 @@ function checkHit () {
 }
 
 function hitMovingBottom (hit, moving) {
-  return hit.some(hitSprite => {
   app.stage.children.filter(sprite => sprite.isSprite).forEach(sprite => sprite.tint = 0xFFFFFF);
   if (game.movingContainer) {
     game.movingContainer.children.forEach(sprite => sprite.tint = 0xFFFFFF);
   }
+  return moving.some(movingSprite => {
+    if (!movingSprite) return false;
+    let hitSprite = hit.find(sprite => sprite && Math.abs(movingSprite.x + game.movingContainer.x - sprite.x) < 2);
     if (!hitSprite) return false;
-    let movingSprite = moving.find((sprite) => hitSprite.x === sprite.x + game.movingContainer.x);
-    return hitTestRectangle(hitSprite, movingSprite)
-  });
     store.guide && (hitSprite.tint = 0xFF0000);
     store.guide && (movingSprite.tint = 0x01FF00);
     return hitTestRectangle(hitSprite, {
