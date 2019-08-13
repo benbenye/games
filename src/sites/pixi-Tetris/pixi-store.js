@@ -10,6 +10,7 @@ export function initStore() {
   data.currentScore = 0;
   data.highestScore = 0;
   data.isGameOver = false;
+  data.guide = false;
 }
 
 export default data;

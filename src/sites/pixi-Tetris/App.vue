@@ -5,6 +5,7 @@
       <div class="menu">
         <div class="btn" @click="restart">new game</div>
         <div class="btn" @click="pause">pause</div>
+        <div class="btn" @click="guide">use guide</div>
       </div>
     </div>
     <div id="box" class="box" ref="box">
@@ -40,6 +41,9 @@ export default {
     },
     pause() {
       pixi.pause();
+    },
+    guide() {
+      this.data.guide = !this.data.guide;
     }
   }
 };

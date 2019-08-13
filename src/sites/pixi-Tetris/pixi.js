@@ -151,7 +151,7 @@ function checkHasOneLine() {
 }
 
 function checkHit () {
-  // remove
+  game.movingContainer.children.forEach(e => e.tint = 0xFFFFFF);
   let sprites = app.stage.children.filter(e => e.isSprite);
   if (sprites.length) {
     let xs = [...new Set(game.movingContainer.children.map(t => t.x + game.movingContainer.x))];
@@ -171,6 +171,9 @@ function checkHit () {
         console.log(movingSprites)
       return hitMovingBottom(hitSprites, movingSprites);
     }
+
+    app.stage.children.filter(sprite => sprite.isSprite).forEach(sprite => sprite.tint = 0xFFFFFF);
+
     return hitWithBottom();
   }
   return hitWithBottom();
@@ -178,10 +181,16 @@ function checkHit () {
 
 function hitMovingBottom (hit, moving) {
   return hit.some(hitSprite => {
+  app.stage.children.filter(sprite => sprite.isSprite).forEach(sprite => sprite.tint = 0xFFFFFF);
+  if (game.movingContainer) {
+    game.movingContainer.children.forEach(sprite => sprite.tint = 0xFFFFFF);
+  }
     if (!hitSprite) return false;
     let movingSprite = moving.find((sprite) => hitSprite.x === sprite.x + game.movingContainer.x);
     return hitTestRectangle(hitSprite, movingSprite)
   });
+    store.guide && (hitSprite.tint = 0xFF0000);
+    store.guide && (movingSprite.tint = 0x01FF00);
     return hitTestRectangle(hitSprite, {
       x: movingSprite.x + game.movingContainer.x,
       y: movingSprite.y + game.movingContainer.y,
@@ -205,6 +214,7 @@ function removeContainer () {
     let sprite = game.movingContainer.children[0];
     sprite.y += game.movingContainer.y;
     sprite.x += game.movingContainer.x;
+    sprite.tint = 0xFFFFFF;
     app.stage.addChild(sprite);
   }
 }
