@@ -144,7 +144,7 @@ function checkHit () {
         _.first(_.sortBy(allInX.filter(sprite => sprite.x === x), ['y']))
       );
       let movingSprites = xs.map(x =>
-        _.first(_.sortBy(game.movingContainer.children.filter(sprite => sprite.x + game.movingContainer.x === x), ['y']))
+        _.last(_.sortBy(game.movingContainer.children.filter(sprite => sprite.x + game.movingContainer.x === x), ['y']))
       );
         console.log(hitSprites)
         console.log(movingSprites)
