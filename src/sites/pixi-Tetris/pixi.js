@@ -67,7 +67,7 @@ function loadProgressHandler (loader, resources) {
 }
 
 function gameStart () {
-  makeTetris(1);
+  makeTetris(randomInt(0, tetris.length - 1))
 }
 
 function play() {
@@ -83,20 +83,20 @@ function play() {
     return;
   }
 
-  game.movingContainer.y += game.movingContainer.vy;
   let hit = checkHit();
   if (hit === 'bottom') {
+    console.log(hit)
     removeContainer();
     checkHasOneLine();
-    makeTetris(1);
+    makeTetris(randomInt(0, tetris.length - 1))
   }
   if (hit === 'hit') {
     console.log(hit)
     removeContainer();
     checkHasOneLine();
-    makeTetris(1)
-    // makeTetris(randomInt(0, tetris.length - 1))
+    makeTetris(randomInt(0, tetris.length - 1))
   }
+  game.movingContainer.y += game.movingContainer.vy;
 }
 
 function isGameOver() {
@@ -141,7 +141,7 @@ function makeTetris (index = 0) {
   });
   game.movingContainer.vy = game.speed;
   game.movingContainer.x = strip(game.spriteWidth * game.containerOffset);
-  game.movingContainer.y = -game.spriteWidth;
+  game.movingContainer.y = -2 * game.spriteWidth;
 }
 
 function checkHasOneLine() {
