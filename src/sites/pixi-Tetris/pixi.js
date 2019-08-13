@@ -18,14 +18,15 @@ let app = null;
 
 const game = {
   app: getApp,
-  delay: 100,
   delayId: null
 };
 
 function getApp () {
+  initStore();
   game.dpr = window.devicePixelRatio;
   game.width = document.getElementById(store.boxId).clientWidth * game.dpr;
   game.spriteWidth = strip(game.width / 10);
+  game.containerOffset = 3;
   game.speed = game.spriteWidth;
   game.movingContainer = new PIXI.Container();
 
@@ -71,7 +72,12 @@ function play() {
   if (game.delayId) return;
   game.delayId = setTimeout(() => {
     game.delayId = null;
-  }, game.delay);
+  }, store.delay);
+
+  if (isGameOver()) {
+    store.isGameOver = true;
+    return;
+  }
 
   game.movingContainer.y += game.movingContainer.vy;
   let hit = checkHit();
@@ -87,6 +93,13 @@ function play() {
     makeTetris(1)
     // makeTetris(randomInt(0, tetris.length - 1))
   }
+}
+
+function isGameOver() {
+  return !!app.stage.children.filter(sprite => sprite.isSprite)
+  .filter(sprite =>
+    sprite.x >= game.spriteWidth * game.containerOffset && sprite.x * game.spriteWidth * (game.containerOffset + 4) && sprite.y <= 2
+  ).length
 }
 
 function createIdTexture () {
@@ -119,7 +132,7 @@ function makeTetris (index = 0) {
     game.movingContainer.addChild(sprite);
   });
   game.movingContainer.vy = game.speed;
-  game.movingContainer.x = strip(game.spriteWidth * 3);
+  game.movingContainer.x = strip(game.spriteWidth * game.containerOffset);
   game.movingContainer.y = -game.spriteWidth;
 }
 
