@@ -4,6 +4,7 @@
       <div class="name">pixi-Tetris</div>
       <div class="menu">
         <div class="btn" @click="restart">new game</div>
+        <div class="btn" @click="pause">pause</div>
       </div>
     </div>
     <div id="box" class="box" ref="box">
@@ -35,6 +36,10 @@ export default {
   },
   methods: {
     restart() {
+      pixi.app();
+    },
+    pause() {
+      pixi.pause();
     }
   }
 };

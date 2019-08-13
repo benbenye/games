@@ -18,6 +18,8 @@ let app = null;
 
 const game = {
   app: getApp,
+  pause,
+  isPause: false,
   delayId: null
 };
 
@@ -74,6 +76,8 @@ function play() {
     game.delayId = null;
   }, store.delay);
 
+  if (game.isPause) return;
+
   if (isGameOver()) {
     store.isGameOver = true;
     return;
@@ -100,6 +104,10 @@ function isGameOver() {
   .filter(sprite =>
     sprite.x >= game.spriteWidth * game.containerOffset && sprite.x * game.spriteWidth * (game.containerOffset + 4) && sprite.y <= 2
   ).length
+}
+
+function pause() {
+  game.isPause = !game.isPause;
 }
 
 function createIdTexture () {
