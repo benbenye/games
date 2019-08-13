@@ -157,9 +157,17 @@ function checkHit () {
 
 function hitMovingBottom (hit, moving) {
   return hit.some(hitSprite => {
+    if (!hitSprite) return false;
     let movingSprite = moving.find((sprite) => hitSprite.x === sprite.x + game.movingContainer.x);
     return hitTestRectangle(hitSprite, movingSprite)
   });
+    return hitTestRectangle(hitSprite, {
+      x: movingSprite.x + game.movingContainer.x,
+      y: movingSprite.y + game.movingContainer.y,
+      width: movingSprite.width,
+      height: movingSprite.height
+    })
+  }) ? 'hit' : null;
 }
 
 function hitWithBottom () {
