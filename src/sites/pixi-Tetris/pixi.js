@@ -147,6 +147,32 @@ function checkHasOneLine() {
 
   console.log(game.movingContainer)
   console.log(app.stage.children)
+  let sprites = _.sortBy(app.stage.children.filter(child => child.isSprite), ['y']).reverse();
+  if (!sprites.length) return;
+  let sortByY = [[sprites[0]]];
+  sprites.slice(1).forEach(sprite => {
+    let index = sortByY.findIndex(sprites =>{
+      return Math.abs(sprites[0].y - sprite.y) < 2
+    })
+    if (index === -1) {
+      let l = [sprite];
+      sortByY.push(l);
+      return;
+    };
+    sortByY[index].push(sprite);
+  });
+  sortByY.forEach((sortSprites, i) => {
+    if (sortSprites.length === 10) {
+      sortSprites.forEach(sprite => {
+        app.stage.removeChild(sprite);
+      });
+      sortByY.slice(i).forEach(s => {
+        s.forEach(sprite => {
+          sprite.y += game.spriteWidth;
+        })
+      })
+    }
+  })
 }
 
 function checkHit () {
