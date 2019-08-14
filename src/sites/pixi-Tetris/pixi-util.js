@@ -40,8 +40,9 @@ export function hitTestRectangle(r1, r2, direction) {
 export function contain(sprite, container) {
 
   let collision = null;
+  let height = sprite.children[0].height
 
-  if (sprite.y + sprite.height > container.height) {
+  if (sprite.y + height > container.height) {
     sprite.y = container.height - sprite.height;
     sprite.vy = 0;
     collision = "bottom";
