@@ -183,15 +183,15 @@ function checkHit () {
     let movingSprites = xs.map(x =>
       _.last(_.sortBy(game.movingContainer.children.filter(sprite => sprite.x + game.movingContainer.x === x), ['y']))
     );
-
     let allInX = sprites.filter(t =>
-      xs.find(x => Math.abs(x - t.x) < 2)
+      xs.some(x => Math.abs(x - t.x) < 2)
     );
 
     if (allInX.length) {
       let hitSprites = movingSprites.map(movingSprite =>
          _.first(_.sortBy(allInX.filter(sprite =>
-           Math.abs(sprite.x - movingSprite.x - game.movingContainer.x) < 2), ['y']))
+           Math.abs(sprite.x - movingSprite.x - game.movingContainer.x) < 2 &&
+           sprite.y - movingSprite.y - game.movingContainer.y >= -1), ['y']))
       );
 
       return hitMovingBottom(hitSprites, movingSprites);
