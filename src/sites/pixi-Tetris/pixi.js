@@ -84,21 +84,17 @@ function play() {
     store.isGameOver = true;
     return;
   }
-
-  let hit = checkHit();
-  if (hit === 'bottom') {
-    console.log(hit)
-    removeContainer();
-    checkHasOneLine();
-    makeTetris(randomInt(0, tetris.length - 1))
-  }
-  if (hit === 'hit') {
-    console.log(hit)
-    removeContainer();
-    checkHasOneLine();
-    makeTetris(randomInt(0, tetris.length - 1))
-  }
+  updateTetris();
   game.movingContainer.y += game.movingContainer.vy;
+}
+
+function updateTetris() {
+  if (checkHit()) {
+    store.delay = 1000;
+    removeContainer();
+    checkHasOneLine();
+    makeTetris(randomInt(0, tetris.length - 1))
+  }
 }
 
 function isGameOver() {
