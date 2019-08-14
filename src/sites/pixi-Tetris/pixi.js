@@ -31,6 +31,7 @@ function getApp () {
   game.containerOffset = 3;
   game.speed = game.spriteWidth;
   game.movingContainer = new PIXI.Container();
+  containerHandler();
 
   app = new PIXI.Application({
     width: this.width,
@@ -67,7 +68,8 @@ function loadProgressHandler (loader, resources) {
 }
 
 function gameStart () {
-  makeTetris(randomInt(0, tetris.length - 1))
+  makeTetris(randomInt(0, tetris.length - 1));
+  eventHandler();
 }
 
 function play() {
@@ -142,6 +144,7 @@ function makeTetris (index = 0) {
   game.movingContainer.vy = game.speed;
   game.movingContainer.x = strip(game.spriteWidth * game.containerOffset);
   game.movingContainer.y = -2 * game.spriteWidth;
+  game.isDowning = false;
 }
 
 function checkHasOneLine() {
@@ -179,6 +182,52 @@ function checkHit () {
   return hitWithBottom();
 }
 
+function checkHitRight () {
+  game.movingContainer.children.forEach(e => e.tint = 0xFFFFFF);
+
+  let sprites = app.stage.children.filter(e => e.isSprite);
+  if (sprites.length) {
+    let ys = [...new Set(game.movingContainer.children.map(t => t.y + game.movingContainer.y))];
+    let movingSprites = ys.map(y =>
+      _.last(_.sortBy(game.movingContainer.children.filter(sprite => sprite.y + game.movingContainer.y === y), ['x']))
+      );
+    let allInY = sprites.filter(t => ys.find(y => Math.abs(y - t.y) < 2))
+
+    if (allInY.length) {
+      let hitSprites = movingSprites.map(movingSprite =>
+        _.first(_.sortBy(allInY.filter(sprite =>
+          Math.abs(sprite.y - movingSprite.y - game.movingContainer.y) < 2), ['x']))
+        );
+        return hitMovingRight(hitSprites, movingSprites);
+    }
+    return null;
+  }
+  return null;
+}
+
+function checkHitLeft () {
+  game.movingContainer.children.forEach(e => e.tint = 0xFFFFFF);
+
+  let sprites = app.stage.children.filter(e => e.isSprite);
+  if (sprites.length) {
+    let ys = [...new Set(game.movingContainer.children.map(t => t.y + game.movingContainer.y))];
+    let movingSprites = ys.map(y =>
+      _.first(_.sortBy(game.movingContainer.children.filter(sprite => sprite.y + game.movingContainer.y === y), ['x']))
+      );
+    let allInY = sprites.filter(t => ys.find(y => Math.abs(y - t.y) < 2))
+
+    if (allInY.length) {
+      let hitSprites = movingSprites.map(movingSprite =>
+        _.last(_.sortBy(allInY.filter(sprite =>
+          Math.abs(sprite.y - movingSprite.y - game.movingContainer.y) < 2), ['x']))
+        );
+        return hitMovingLeft(hitSprites, movingSprites);
+    }
+    return null;
+  }
+  return null;
+}
+
 function hitMovingBottom (hit, moving) {
   app.stage.children.filter(sprite => sprite.isSprite).forEach(sprite => sprite.tint = 0xFFFFFF);
   if (game.movingContainer) {
@@ -195,8 +244,48 @@ function hitMovingBottom (hit, moving) {
       y: movingSprite.y + game.movingContainer.y,
       width: movingSprite.width,
       height: movingSprite.height
-    })
+    }, 'down')
   }) ? 'hit' : null;
+}
+
+function hitMovingRight (hit, moving) {
+  app.stage.children.filter(sprite => sprite.isSprite).forEach(sprite => sprite.tint = 0xFFFFFF);
+  if (game.movingContainer) {
+    game.movingContainer.children.forEach(sprite => sprite.tint = 0xFFFFFF);
+  }
+  return moving.some(movingSprite => {
+    if (!movingSprite) return false;
+    let hitSprite = hit.find(sprite => sprite && Math.abs(movingSprite.y + game.movingContainer.y - sprite.y) < 2);
+    if (!hitSprite) return false;
+    store.guide && (hitSprite.tint = 0x9000A8);
+    store.guide && (movingSprite.tint = 0x01FF00);
+    return hitTestRectangle(hitSprite, {
+      x: movingSprite.x + game.movingContainer.x,
+      y: movingSprite.y + game.movingContainer.y,
+      width: movingSprite.width,
+      height: movingSprite.height
+    }, 'right')
+  }) ? 'hit-right' : null;
+}
+
+function hitMovingLeft (hit, moving) {
+  app.stage.children.filter(sprite => sprite.isSprite).forEach(sprite => sprite.tint = 0xFFFFFF);
+  if (game.movingContainer) {
+    game.movingContainer.children.forEach(sprite => sprite.tint = 0xFFFFFF);
+  }
+  return moving.some(movingSprite => {
+    if (!movingSprite) return false;
+    let hitSprite = hit.find(sprite => sprite && Math.abs(movingSprite.y + game.movingContainer.y - sprite.y) < 2);
+    if (!hitSprite) return false;
+    store.guide && (hitSprite.tint = 0x003D82);
+    store.guide && (movingSprite.tint = 0x01FF00);
+    return hitTestRectangle(hitSprite, {
+      x: movingSprite.x + game.movingContainer.x,
+      y: movingSprite.y + game.movingContainer.y,
+      width: movingSprite.width,
+      height: movingSprite.height
+    }, 'left')
+  }) ? 'hit-left' : null;
 }
 
 function hitWithBottom () {
@@ -215,6 +304,39 @@ function removeContainer () {
     sprite.x += game.movingContainer.x;
     sprite.tint = 0xFFFFFF;
     app.stage.addChild(sprite);
+  }
+}
+
+function eventHandler() {
+  keyboard(37).release = game.movingContainer.left;
+  keyboard(38).release = game.movingContainer.up;
+  keyboard(39).release = game.movingContainer.right;
+  keyboard(40).release = game.movingContainer.down;
+}
+
+function containerHandler() {
+  game.movingContainer.left = function () {
+    if (game.isDowning || game.isPause) return;
+    if (game.movingContainer.x - game.spriteWidth < -1) return;
+    if (checkHitLeft()) return;
+    game.movingContainer.x = strip(game.movingContainer.x - game.spriteWidth);
+    updateTetris();
+  }
+  game.movingContainer.right = function () {
+    if (game.isDowning || game.isPause) return;
+    if (game.movingContainer.x + game.movingContainer.width > game.width - 1) return;
+    if (checkHitRight()) return;
+
+    game.movingContainer.x += game.spriteWidth;
+    updateTetris();
+  }
+  game.movingContainer.down = function() {
+    if (game.isDowning || game.isPause) return;
+    game.isDowning = true;
+    store.delay = 10;
+    clearTimeout(game.delayId);
+    game.delayId = null;
+    updateTetris();
   }
 }
 
