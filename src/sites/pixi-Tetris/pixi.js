@@ -68,7 +68,8 @@ function loadProgressHandler (loader, resources) {
 }
 
 function gameStart () {
-  makeTetris(randomInt(0, tetris.length - 1));
+  // makeTetris(randomInt(0, tetris.length - 1));
+  makeTetris(5);
   eventHandler();
 }
 
@@ -78,23 +79,28 @@ function play() {
     game.delayId = null;
   }, store.delay);
 
+  console.log(game.movingContainer)
   if (game.isPause) return;
 
   if (isGameOver()) {
     store.isGameOver = true;
     return;
   }
-  updateTetris();
-  game.movingContainer.y += game.movingContainer.vy;
+  let hitStatus = updateTetris();
+  if (!hitStatus) {
+    game.movingContainer.y += game.movingContainer.vy;
+  }
 }
 
 function updateTetris() {
-  if (checkHit()) {
+  let hit = checkHit();
+  if (hit) {
     store.delay = 1000;
     removeContainer();
     checkHasOneLine();
     makeTetris(randomInt(0, tetris.length - 1))
   }
+  return hit;
 }
 
 function isGameOver() {
@@ -122,25 +128,31 @@ function setupSprite ({x, y}) {
   return sprite2;
 }
 
-function makeTetris (index = 0) {
-  tetris[index].slice(0, 4).map(t => {
+function makeTetris (index, offsetX = 0, offsetY = 0) {
+  let tetrisCoordinate = typeof index === 'number' ? tetris[index] : game.movingContainer.tetris;
+  if (typeof index === 'number') {
+    game.movingContainer.angle = 0;
+  }
+  tetrisCoordinate.slice(0, 4).map(t => {
     return setupSprite({
-      x: t.x * game.spriteWidth,
-      y: t.y * game.spriteWidth,
+      x: (t.x - offsetX) * game.spriteWidth,
+      y: (t.y - offsetY) * game.spriteWidth,
       v: {
         vx: 0,
         vy: 0
-      },
-      originX: _.last(tetris[index]).x,
-      originY: _.last(tetris[index]).y
+      }
     })
   }).forEach(sprite => {
     game.movingContainer.addChild(sprite);
   });
+  game.movingContainer.tetris = tetrisCoordinate;
   game.movingContainer.vy = game.speed;
-  game.movingContainer.x = strip(game.spriteWidth * game.containerOffset);
-  game.movingContainer.y = -2 * game.spriteWidth;
+  if (typeof index === 'number') {
+    game.movingContainer.x = strip(game.spriteWidth * game.containerOffset);
+    game.movingContainer.y = -2 * game.spriteWidth;
+  }
   game.isDowning = false;
+  game.movingContainer.idName = index;
 }
 
 function checkHasOneLine() {
@@ -163,14 +175,30 @@ function checkHasOneLine() {
   });
   sortByY.forEach((sortSprites, i) => {
     if (sortSprites.length === 10) {
-      sortSprites.forEach(sprite => {
-        app.stage.removeChild(sprite);
-      });
-      sortByY.slice(i).forEach(s => {
-        s.forEach(sprite => {
-          sprite.y += game.spriteWidth;
-        })
-      })
+      let i = 0;
+      game.isPause = true;
+      let ss = setInterval(() => {
+        sortSprites.forEach(sprite => {
+          if (i % 2) {
+            sprite.alpha = 0.5
+            return
+          }
+            sprite.alpha = 1
+        });
+        if (i > 3) {
+          clearInterval(ss)
+          sortSprites.forEach(sprite => {
+            app.stage.removeChild(sprite);
+          });
+          sortByY.slice(i).forEach(s => {
+            s.forEach(sprite => {
+              sprite.y += game.spriteWidth;
+            })
+          })
+          game.isPause = false;
+        }
+        ++i
+      }, 300);
     }
   })
 }
@@ -193,8 +221,10 @@ function checkHit () {
            Math.abs(sprite.x - movingSprite.x - game.movingContainer.x) < 2 &&
            sprite.y - movingSprite.y - game.movingContainer.y >= -1), ['y']))
       );
-
-      return hitMovingBottom(hitSprites, movingSprites);
+      if (_.compact(hitSprites).length) {
+        return hitMovingBottom(hitSprites, movingSprites);
+      }
+      return hitWithBottom();
     }
 
     app.stage.children.filter(sprite => sprite.isSprite).forEach(sprite => sprite.tint = 0xFFFFFF);
@@ -340,16 +370,26 @@ function containerHandler() {
   game.movingContainer.left = function () {
     if (game.isDowning || game.isPause) return;
     if (game.movingContainer.x - game.spriteWidth < -1) return;
-    if (checkHitLeft()) return;
+    game.isPause = true;
+    if (checkHitLeft()) {
+      game.isPause = false;
+      return;
+    }
     game.movingContainer.x = strip(game.movingContainer.x - game.spriteWidth);
+    game.isPause = false;
     updateTetris();
   }
   game.movingContainer.right = function () {
     if (game.isDowning || game.isPause) return;
     if (game.movingContainer.x + game.movingContainer.width > game.width - 1) return;
-    if (checkHitRight()) return;
+    game.isPause = true;
+    if (checkHitRight()) {
+      game.isPause = false;
+      return;
+    }
 
     game.movingContainer.x += game.spriteWidth;
+    game.isPause = false;
     updateTetris();
   }
   game.movingContainer.down = function() {
@@ -360,6 +400,62 @@ function containerHandler() {
     game.delayId = null;
     updateTetris();
   }
+  game.movingContainer.up = function() {
+    if (game.isDowning) return;
+    rotate(game.movingContainer.idName);
+  }
+}
+
+function getContainerWidth() {
+  return [...new Set(game.movingContainer.children.map(sprite => sprite.x))].length * game.spriteWidth;
+}
+function getContainerHeight() {
+  return [...new Set(game.movingContainer.children.map(sprite => sprite.y))].length * game.spriteWidth;
+}
+
+function rotate() {
+  // check can be rotate
+  // ...
+  game.movingContainer.angle = (game.movingContainer.angle + 1 ) % 3;
+  let {tetris, angle} = game.movingContainer;
+  const original = tetris.slice(0, 4);
+  const origin = tetris[4];
+  let offsetX = 0;
+  let offsetY = 0;
+  let offsetIX = 0;
+  let offsetIY = 0;
+  if (origin.x === 0 && origin.y === 0) return;
+  if (origin.x === 1 && origin.y === 0) {
+    // offsetX = 1;
+    // offsetY = -1
+    offsetIX = 1;
+  } else {
+    if (angle === 0) {
+      offsetY = -1;
+    } else if (angle === 1) {
+      offsetX = 1;
+    } else if (angle === 2) {
+      offsetY = 1;
+      offsetX = -1;
+    }
+  }
+  const newTetris = original.map(o => {
+    return {
+      x: origin.x + origin.y - o.y + offsetIX,
+      y: o.x + origin.y - origin.x
+    };
+  });
+  newTetris.push(origin);
+  console.log(`
+  angle: ${angle}
+  offsetX: ${offsetX}, offsetY: ${offsetY}, offsetIX: ${offsetIX}`)
+  newTetris.push(origin);
+  game.movingContainer.tetris = newTetris;
+  game.movingContainer.removeChildren();
+  game.movingContainer.x = game.movingContainer.x + offsetX * game.spriteWidth;
+  game.movingContainer.y = game.movingContainer.y + offsetY * game.spriteWidth;
+  makeTetris('rotate', offsetX, offsetY);
+  console.log(game.movingContainer)
 }
 
 export default game;
