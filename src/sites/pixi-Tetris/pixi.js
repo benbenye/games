@@ -193,11 +193,14 @@ function checkHasOneLine() {
           sortSprites.forEach(sprite => {
             app.stage.removeChild(sprite);
           });
-          sortByY.slice(i).forEach(s => {
-            s.forEach(sprite => {
-              sprite.y += game.spriteWidth;
-            })
+          sprites.filter(sprite => sprite.y < sortSprites[0].y).forEach(s => {
+            s.y += game.spriteWidth;
           })
+          // sortByY.slice(i).forEach(s => {
+          //   s.forEach(sprite => {
+          //     sprite.y += game.spriteWidth;
+          //   })
+          // })
           game.isPause = false;
         }
         ++i
