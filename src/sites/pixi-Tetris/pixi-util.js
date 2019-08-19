@@ -35,18 +35,3 @@ export function hitTestRectangle(r1, r2, direction) {
     return Math.abs(r2.x + r2.width - r1.x) <= 2;
   }
 };
-
-
-export function contain(sprite, container) {
-
-  let collision = null;
-  let height = sprite.children[0].height
-
-  if (sprite.y + height > container.height) {
-    sprite.y = container.height - sprite.height;
-    sprite.vy = 0;
-    collision = "bottom";
-  }
-
-  return collision;
-}
