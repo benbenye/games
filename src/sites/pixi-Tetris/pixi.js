@@ -79,7 +79,6 @@ function play() {
     game.delayId = null;
   }, store.delay);
 
-  console.log(game.movingContainer)
   if (game.isPause) return;
 
   if (isGameOver()) {
@@ -451,16 +450,10 @@ function rotate() {
     };
   });
   newTetris.push(origin);
-  console.log(`
-  angle: ${angle}
-  offsetX: ${offsetX}, offsetY: ${offsetY}, offsetIX: ${offsetIX}`)
   newTetris.push(origin);
   game.movingContainer.tetris = newTetris;
   game.movingContainer.removeChildren();
-  game.movingContainer.x = game.movingContainer.x + offsetX * game.spriteWidth;
-  game.movingContainer.y = game.movingContainer.y + offsetY * game.spriteWidth;
-  makeTetris('rotate', offsetX, offsetY);
-  console.log(game.movingContainer)
+  makeTetris('rotate');
 }
 
 export default game;
