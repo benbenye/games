@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js'
 import _ from 'lodash';
 import one from './assets/one.png';
 import store, {initStore} from './pixi-store';
-import {keyboard, randomInt, strip, transform, chunk, setAnimation, hitTestRectangle, contain} from './pixi-util';
+import {keyboard, randomInt, strip, transform, chunk, setAnimation, hitTestRectangle} from './pixi-util';
 
 const tetris = [
   [{x: 0, y: 0}, {x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 1}],
@@ -342,11 +342,23 @@ function hitMovingLeft (hit, moving) {
 
 function hitWithBottom () {
   return contain(game.movingContainer, {
-    x: 0,
-    y: 0,
-    width: app.renderer.width,
     height: app.renderer.height
   });
+}
+function contain(sprite, container) {
+  let collision = null;
+  const height = getContainerHeight();
+  const topSpriteY = getSpritesInCoordinate('y').sort((a, b) => {
+    if (a - b < 0) return -1;
+    return 1;
+  })[0];
+
+  if (game.movingContainer.y + topSpriteY + height >= container.height) {
+    sprite.vy = 0;
+    collision = "bottom";
+  }
+
+  return collision;
 }
 
 function removeContainer () {
