@@ -1,5 +1,3 @@
-import BezierEasing from 'bezier-easing';
-
 export function keyboard(keyCode) {
   let key = {};
   key.code = keyCode;
@@ -46,18 +44,21 @@ export function chunk (s, d) {
   return r;
 }
 
-const easing = new BezierEasing(0.25,1,0.25,1);
-
 export function setAnimation (sprite, scaleX) {
-  let i = scaleX * 0.2;
+  let i = 0;
+  let op = 1;
 
   let o = setInterval(() => {
-    i += scaleX * 0.09;
-    sprite.scale.set(strip(easing(i)), strip(easing(i)));
+    i += scaleX * 0.09 * op;
+    sprite.scale.set(strip(i), strip(i));
+    sprite.visible = true;
 
-    if(strip(easing(i)) >= scaleX * 1.1) {
+    if(strip(i) >= scaleX * 1.3) {
+      op = -1;
+    }
+    if (strip(i) <= scaleX && op === -1) {
       sprite.scale.set(scaleX, scaleX);
       clearInterval(o);
     }
-  }, 10);
+  }, 12);
 }
