@@ -15,6 +15,16 @@
       <div id="tetris"></div>
     </div>
     <game-over v-show="data.isGameOver"></game-over>
+
+    <div class="control">
+      <div class="btn up" @click="up">↑</div>
+    </div>
+
+    <div class="control">
+      <div class="btn left" @click="left">←</div>
+      <div class="btn down" @click="down">↓</div>
+      <div class="btn right" @click="right">→</div>
+    </div>
   </div>
 </template>
 
@@ -44,6 +54,18 @@ export default {
     },
     guide() {
       this.data.guide = !this.data.guide;
+    },
+    up() {
+      pixi.movingContainer.up();
+    },
+    left() {
+      pixi.movingContainer.left();
+    },
+    right() {
+      pixi.movingContainer.right();
+    },
+    down() {
+      pixi.movingContainer.down();
     }
   }
 };
@@ -116,6 +138,16 @@ export default {
       left: 0;
     }
   }
+    .control {
+      text-align: right;
+      .btn {
+        padding: px2rem(30);
+        margin-left: px2rem(20);
+        display: inline-block;
+        color: #fff;
+        background-color: #413e35;
+        }
+    }
 $moboleWidth: px2rem(640);
 $pcMiddleWidth: px2rem(640);
 $pcBigWidth: px2rem(350);
