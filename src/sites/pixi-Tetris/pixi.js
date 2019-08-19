@@ -68,8 +68,7 @@ function loadProgressHandler (loader, resources) {
 }
 
 function gameStart () {
-  // makeTetris(randomInt(0, tetris.length - 1));
-  makeTetris(5);
+  makeTetris(randomInt(0, tetris.length - 1));
   eventHandler();
 }
 
@@ -148,7 +147,12 @@ function makeTetris (index, offsetX = 0, offsetY = 0) {
   game.movingContainer.vy = game.speed;
   if (typeof index === 'number') {
     game.movingContainer.x = strip(game.spriteWidth * game.containerOffset);
-    game.movingContainer.y = -2 * game.spriteWidth;
+    if (_.last(tetrisCoordinate).x === 1 && _.last(tetrisCoordinate).y === 1) {
+      game.movingContainer.y = -1 * game.spriteWidth;
+    } else {
+      game.movingContainer.y = -2 * game.spriteWidth;
+    }
+
   }
   game.isDowning = false;
   game.movingContainer.idName = index;
@@ -351,8 +355,7 @@ function contain(sprite, container) {
     if (a - b < 0) return -1;
     return 1;
   })[0];
-
-  if (game.movingContainer.y + topSpriteY + height >= container.height) {
+  if (strip(game.movingContainer.y + topSpriteY + height) >= strip(container.height)) {
     sprite.vy = 0;
     collision = "bottom";
   }
