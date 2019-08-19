@@ -381,7 +381,7 @@ function eventHandler() {
 function containerHandler() {
   game.movingContainer.left = function () {
     if (game.isDowning || game.isPause) return;
-    if (game.movingContainer.x - game.spriteWidth < -1) return;
+    if (game.movingContainer.x + leftSprites()[0].x - game.spriteWidth < -1) return;
     game.isPause = true;
     if (checkHitLeft()) {
       game.isPause = false;
@@ -393,7 +393,7 @@ function containerHandler() {
   }
   game.movingContainer.right = function () {
     if (game.isDowning || game.isPause) return;
-    if (game.movingContainer.x + game.movingContainer.width > game.width - 1) return;
+    if (game.movingContainer.x + leftSprites()[0].x + getContainerWidth() > game.width - 1) return;
     game.isPause = true;
     if (checkHitRight()) {
       game.isPause = false;
@@ -419,37 +419,30 @@ function containerHandler() {
 }
 
 function getContainerWidth() {
-  return [...new Set(game.movingContainer.children.map(sprite => sprite.x))].length * game.spriteWidth;
+  return getSpritesInCoordinate('x').length * game.spriteWidth;
 }
 function getContainerHeight() {
-  return [...new Set(game.movingContainer.children.map(sprite => sprite.y))].length * game.spriteWidth;
+  return getSpritesInCoordinate('y').length * game.spriteWidth;
+}
+function leftSprites() {
+  const leftX = _.sortBy(getSpritesInCoordinate('x'))[0];
+  return _.sortBy(game.movingContainer.children, ['x']).filter(sprite => sprite.x === leftX);
+}
+function getSpritesInCoordinate(coo) {
+  return [...new Set(game.movingContainer.children.map(sprite => sprite[coo]))]
 }
 
 function rotate() {
   // check can be rotate
   // ...
-  game.movingContainer.angle = (game.movingContainer.angle + 1 ) % 3;
-  let {tetris, angle} = game.movingContainer;
+  let {tetris} = game.movingContainer;
   const original = tetris.slice(0, 4);
   const origin = tetris[4];
-  let offsetX = 0;
-  let offsetY = 0;
   let offsetIX = 0;
   let offsetIY = 0;
   if (origin.x === 0 && origin.y === 0) return;
   if (origin.x === 1 && origin.y === 0) {
-    // offsetX = 1;
-    // offsetY = -1
     offsetIX = 1;
-  } else {
-    if (angle === 0) {
-      offsetY = -1;
-    } else if (angle === 1) {
-      offsetX = 1;
-    } else if (angle === 2) {
-      offsetY = 1;
-      offsetX = -1;
-    }
   }
   const newTetris = original.map(o => {
     return {
