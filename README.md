@@ -2,6 +2,7 @@
 益智游戏合辑
 
 # 1: [2048](https://github.com/benbenye/games/tree/master/src/sites/2048) 
+# 2: [Tetris](https://github.com/benbenye/games/tree/master/src/sites/pixi-Tetris) 
 
 ## Project setup
 ```bash
