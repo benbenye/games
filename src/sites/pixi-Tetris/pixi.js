@@ -378,6 +378,7 @@ function eventHandler() {
   keyboard(38).release = game.movingContainer.up;
   keyboard(39).release = game.movingContainer.right;
   keyboard(40).release = game.movingContainer.down;
+  keyboard(32).release = pause;
 }
 
 function containerHandler() {
