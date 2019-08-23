@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js'
 import _ from 'lodash';
 import one from './assets/one.png';
 import store, {initStore} from './pixi-store';
-import {keyboard, randomInt, strip, transform, chunk, setAnimation, hitTestRectangle} from './pixi-util';
+import {keyboard, randomInt, strip, hitTestRectangle} from './pixi-util';
 
 const tetris = [
   [{x: 0, y: 0}, {x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 1}],
@@ -68,8 +68,7 @@ function loadProgressHandler (loader, resources) {
 }
 
 function gameStart () {
-  // makeTetris(randomInt(0, tetris.length - 1));
-  makeTetris(5);
+  makeTetris(randomInt(0, tetris.length - 1));
   eventHandler();
 }
 
@@ -148,16 +147,18 @@ function makeTetris (index, offsetX = 0, offsetY = 0) {
   game.movingContainer.vy = game.speed;
   if (typeof index === 'number') {
     game.movingContainer.x = strip(game.spriteWidth * game.containerOffset);
-    game.movingContainer.y = -2 * game.spriteWidth;
+    if (_.last(tetrisCoordinate).x === 1 && _.last(tetrisCoordinate).y === 1) {
+      game.movingContainer.y = -1 * game.spriteWidth;
+    } else {
+      game.movingContainer.y = -2 * game.spriteWidth;
+    }
+
   }
   game.isDowning = false;
   game.movingContainer.idName = index;
 }
 
 function checkHasOneLine() {
-
-  console.log(game.movingContainer)
-  console.log(app.stage.children)
   let sprites = _.sortBy(app.stage.children.filter(child => child.isSprite), ['y']).reverse();
   if (!sprites.length) return;
   let sortByY = [[sprites[0]]];
@@ -189,11 +190,14 @@ function checkHasOneLine() {
           sortSprites.forEach(sprite => {
             app.stage.removeChild(sprite);
           });
-          sortByY.slice(i).forEach(s => {
-            s.forEach(sprite => {
-              sprite.y += game.spriteWidth;
-            })
+          sprites.filter(sprite => sprite.y < sortSprites[0].y).forEach(s => {
+            s.y += game.spriteWidth;
           })
+          // sortByY.slice(i).forEach(s => {
+          //   s.forEach(sprite => {
+          //     sprite.y += game.spriteWidth;
+          //   })
+          // })
           game.isPause = false;
         }
         ++i
@@ -351,8 +355,7 @@ function contain(sprite, container) {
     if (a - b < 0) return -1;
     return 1;
   })[0];
-
-  if (game.movingContainer.y + topSpriteY + height >= container.height) {
+  if (strip(game.movingContainer.y + topSpriteY + height) >= strip(container.height)) {
     sprite.vy = 0;
     collision = "bottom";
   }
@@ -375,6 +378,7 @@ function eventHandler() {
   keyboard(38).release = game.movingContainer.up;
   keyboard(39).release = game.movingContainer.right;
   keyboard(40).release = game.movingContainer.down;
+  keyboard(32).release = pause;
 }
 
 function containerHandler() {
@@ -438,7 +442,6 @@ function rotate() {
   const original = tetris.slice(0, 4);
   const origin = tetris[4];
   let offsetIX = 0;
-  let offsetIY = 0;
   if (origin.x === 0 && origin.y === 0) return;
   if (origin.x === 1 && origin.y === 0) {
     offsetIX = 1;
@@ -449,11 +452,43 @@ function rotate() {
       y: o.x + origin.y - origin.x
     };
   });
-  newTetris.push(origin);
+  correctCoordinate(newTetris);
   newTetris.push(origin);
   game.movingContainer.tetris = newTetris;
   game.movingContainer.removeChildren();
   makeTetris('rotate');
+}
+
+function correctCoordinate(cos) {
+  // 1 for overflow x, 0 for overflow bottom
+  let dirRight = 0;
+  let dirLeft = 0;
+  let dirY = 0;
+  const conX = game.movingContainer.x;
+  const conY = game.movingContainer.y;
+  cos.forEach(co => {
+    let left = co.x * game.spriteWidth + conX;
+    if ( left < 0 ) {
+      dirLeft = 1;
+    }
+    if (strip(left + game.spriteWidth) > app.renderer.width) {
+      dirRight = 1;
+    }
+    if (strip(co.y * game.spriteWidth + conY + game.spriteWidth) > app.renderer.height) {
+      dirY = 1;
+    }
+  });
+  console.log(`${dirLeft}, ${dirRight}, ${dirY}`)
+  if (!dirLeft && !dirRight && !dirY) return;
+  if (dirLeft) {
+    game.movingContainer.x -= _.first(_.sortBy(cos, ['x'])).x * game.spriteWidth + conX;
+  }
+  if (dirRight) {
+    game.movingContainer.x -= _.last(_.sortBy(cos, ['x'])).x * game.spriteWidth + game.spriteWidth + conX - app.renderer.width;
+  }
+  if(dirY) {
+    game.movingContainer.y -= _.last(_.sortBy(cos, ['y'])).y * game.spriteWidth + game.spriteWidth + conY - app.renderer.height
+  }
 }
 
 export default game;

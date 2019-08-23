@@ -48,19 +48,6 @@
     "stylus-loader": "^3.0.2",
     "vue-template-compiler": "^2.6.10"
   },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.js": [
-      "cross-env NODE_ENV=production vue-cli-service lint",
-      "git add"
-    ],
-    "*.vue": [
-      "cross-env NODE_ENV=production vue-cli-service lint",
-      "git add"
-    ]
-  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
