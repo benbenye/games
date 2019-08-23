@@ -452,11 +452,43 @@ function rotate() {
       y: o.x + origin.y - origin.x
     };
   });
-  newTetris.push(origin);
+  correctCoordinate(newTetris);
   newTetris.push(origin);
   game.movingContainer.tetris = newTetris;
   game.movingContainer.removeChildren();
   makeTetris('rotate');
+}
+
+function correctCoordinate(cos) {
+  // 1 for overflow x, 0 for overflow bottom
+  let dirRight = 0;
+  let dirLeft = 0;
+  let dirY = 0;
+  const conX = game.movingContainer.x;
+  const conY = game.movingContainer.y;
+  cos.forEach(co => {
+    let left = co.x * game.spriteWidth + conX;
+    if ( left < 0 ) {
+      dirLeft = 1;
+    }
+    if (strip(left + game.spriteWidth) > app.renderer.width) {
+      dirRight = 1;
+    }
+    if (strip(co.y * game.spriteWidth + conY + game.spriteWidth) > app.renderer.height) {
+      dirY = 1;
+    }
+  });
+  console.log(`${dirLeft}, ${dirRight}, ${dirY}`)
+  if (!dirLeft && !dirRight && !dirY) return;
+  if (dirLeft) {
+    game.movingContainer.x -= _.first(_.sortBy(cos, ['x'])).x * game.spriteWidth + conX;
+  }
+  if (dirRight) {
+    game.movingContainer.x -= _.last(_.sortBy(cos, ['x'])).x * game.spriteWidth + game.spriteWidth + conX - app.renderer.width;
+  }
+  if(dirY) {
+    game.movingContainer.y -= _.last(_.sortBy(cos, ['y'])).y * game.spriteWidth + game.spriteWidth + conY - app.renderer.height
+  }
 }
 
 export default game;
