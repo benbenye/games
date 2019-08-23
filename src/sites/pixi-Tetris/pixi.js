@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js'
 import _ from 'lodash';
 import one from './assets/one.png';
 import store, {initStore} from './pixi-store';
-import {keyboard, randomInt, strip, transform, chunk, setAnimation, hitTestRectangle} from './pixi-util';
+import {keyboard, randomInt, strip, hitTestRectangle} from './pixi-util';
 
 const tetris = [
   [{x: 0, y: 0}, {x: 1, y: 0}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 1}],
@@ -159,9 +159,6 @@ function makeTetris (index, offsetX = 0, offsetY = 0) {
 }
 
 function checkHasOneLine() {
-
-  console.log(game.movingContainer)
-  console.log(app.stage.children)
   let sprites = _.sortBy(app.stage.children.filter(child => child.isSprite), ['y']).reverse();
   if (!sprites.length) return;
   let sortByY = [[sprites[0]]];
@@ -444,7 +441,6 @@ function rotate() {
   const original = tetris.slice(0, 4);
   const origin = tetris[4];
   let offsetIX = 0;
-  let offsetIY = 0;
   if (origin.x === 0 && origin.y === 0) return;
   if (origin.x === 1 && origin.y === 0) {
     offsetIX = 1;
