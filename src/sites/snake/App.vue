@@ -71,8 +71,6 @@ export default {
 <style lang="scss" scoped>
 @import '~@/assets/style/util.scss';
 #app {
-    margin-left: auto;
-    margin-right: auto;
   .content {
     width: 90%;
     margin-left: auto;
