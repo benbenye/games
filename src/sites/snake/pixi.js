@@ -195,16 +195,12 @@ function checkHit () {
 
 function horizontal(direction) {
   return () => {
-    console.log(head.vy)
     if (head.vx) {
       return;
     }
     game.isPause = true;
     head.vx = game.speed * direction;
-    // head.x += head.vx;
-    // head.y -= head.vy;
     head.vy = 0;
-    // moveForward(true);
     game.isPause = false;
   }
 }
@@ -214,13 +210,9 @@ function vertical(direction) {
     if (head.vy) {
       return;
     }
-
     game.isPause = true;
     head.vy = game.speed * direction;
-    // head.y += head.vy;
-    // head.x -= head.vx;
     head.vx = 0;
-    // moveForward(true);
     game.isPause = false;
   }
 }
