@@ -120,20 +120,6 @@ function moveForward(noHead) {
   }
 }
 
-function changeDirection() {
-  let spriteA = head;
-  sprites.forEach((spriteB, i) => {
-    // if (i===0) return false;
-    console.log(`i:${i}, x: ${spriteB.x}, y: ${spriteB.y}`)
-    if (spriteA.vx === spriteB.vx && spriteA.vy === spriteB.vy) return false;
-    spriteB.vy = spriteA.vy;
-    spriteB.vx = spriteA.vx;
-    spriteA = spriteB;
-    return true;
-  });
-}
-
-
 function isGameOver() {
   return game.isGameOver;
 }
