@@ -143,30 +143,42 @@ function setupSprite ({x, y, v}) {
   return sprite2;
 }
 
-function makeOneSnake ({x, y}) {
-  let sprite = setupSprite({
-    x: x * game.spriteWidth,
-    y: y * game.spriteWidth,
-    v: {
-      vx: 0,
-      vy: 0
-    }
-  });
-  game.movingContainer.addChild(sprite);
-  game.movingContainer.vy = game.speed;
-  if (typeof index === 'number') {
-    game.movingContainer.x = strip(game.spriteWidth * game.containerOffset);
-    game.movingContainer.y = -2 * game.spriteWidth;
+function setupFoodSprite ({x, y}) {
+  let sprite2 = new PIXI.Sprite(game.foodTexture);
+  sprite2.x = strip(x * game.spriteWidth);
+  sprite2.y = strip(y * game.spriteWidth);
+  sprite2.width = game.spriteWidth;
+  sprite2.height = game.spriteWidth;
+  return sprite2;
+}
+
+
+function randomFood () {
+  const index = getOnlyRandomIndex(_.random(1199));
+  foodContainer.addChild(setupFoodSprite({...transform(index, 40)}));
+  food = foodContainer.children[0]
+}
+
+function getOnlyRandomIndex (index) {
+  if (checkIsRepeat(index)) {
+    index = ++index % (30 * 40 - 1);
+    return getOnlyRandomIndex(index);
   }
-  game.isDowning = false;
-  game.movingContainer.idName = index;
+  return index;
+}
+
+function checkIsRepeat(i) {
+  let {x, y} = transform(i, 40);
+  return snake.some(one => {
+    return Math.abs(one.x - x * game.spriteWidth) < 1 && Math.abs(one.y - y * game.spriteWidth) < 1
+  });
 }
 
 function initSnake () {
   // start in 3 * 4
-  while (sprites.length < 10) {
-    app.stage.addChild(setupSprite({
-      x: 13 - sprites.length,
+  while (snake.length < 10) {
+    snakeContainer.addChild(setupSprite({
+      x: 12 - snake.length,
       y: 4,
       v: {
         vx: game.speed,
