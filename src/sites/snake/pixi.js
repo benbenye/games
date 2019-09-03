@@ -71,14 +71,10 @@ function loadProgressHandler (loader, resources) {
 
 function gameStart () {
   initSnake();
+  randomFood();
 }
 
 function play() {
-  if (game.delayId) return;
-  game.delayId = setTimeout(() => {
-    game.delayId = null;
-  }, store.delay);
-
   if (game.isPause) return;
 
   if (isGameOver()) {
@@ -86,11 +82,25 @@ function play() {
     return;
   }
   let hit = checkHit();
-
-  if (hit) {
+  if (hit || snake.length >= 30 * 40 -1) {
+    if (hit === 'food') {
+      foodContainer.removeChildren();
+      addSnakeTail();
+      if (snake.length >= 30 * 40 -1) {
+        game.isGameOver = true;
+        return;
+      }
+      randomFood();
+      return;
+    }
     game.isGameOver = true;
     return;
   }
+  if (game.delayId) return;
+  game.delayId = setTimeout(() => {
+    game.delayId = null;
+  }, store.delay);
+
   // changeDirection();
   moveForward();
   // updateSprite();
