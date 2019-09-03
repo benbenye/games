@@ -174,17 +174,51 @@ function initSnake () {
       }
     }))
   }
-  head = sprites[0];
+  head = snake[0];
+}
+
+function addSnakeTail() {
+  const tail = _.last(snake);
+  snakeContainer.addChild(setupSprite({
+    x: tail.x - tail.vx,
+    x: tail.x - tail.vy,
+    v: {
+      vx: tail.vx,
+      vy: tail.vy
+    }
+  }))
 }
 
 function checkHit () {
   if (head.x < 0 || head.y < 0 || head.x > app.view.width || head.y > app.view.height ) {
     return 'hitWall';
   }
-  if (0) {
+  if (checkHitSelf()) {
     return 'hitSelf';
   }
+  if (eatFood()) {
+    return 'food';
+  }
   return null;
+}
+
+function eatFood() {
+  if (Math.abs(food.x - head.x) <= game.spriteWidth && Math.abs(food.y - head.y) <= game.spriteWidth) {
+    return true;
+  }
+  return false;
+}
+
+function checkHitSelf () {
+  let hit = false;
+  for (let i = 1; i < snake.length - 1; i++) {
+    let one = snake[i];
+    if (Math.abs(one.x - head.x) < 1 && Math.abs(one.y - head.y) < 1) {
+      hit = true;
+      break;
+    }
+  }
+  return hit;
 }
 
 function horizontal(direction) {
