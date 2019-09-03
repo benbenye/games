@@ -1,12 +1,15 @@
 import * as PIXI from 'pixi.js'
 import _ from 'lodash';
-import snake from './assets/snake.png';
-import food from './assets/food.png';
+import snakePng from './assets/snake.png';
+import foodPng from './assets/food.png';
 import store, {initStore} from './pixi-store';
-import {strip} from './pixi-util';
+import {strip, transform} from './pixi-util';
 
 let app = null;
-let sprites = null;
+let snake = null;
+let snakeContainer = null;
+let food = null;
+let foodContainer = null;
 let head = null;
 
 const game = {
@@ -43,10 +46,16 @@ function init () {
   app.renderer.view.style.position = 'absolute';
   app.renderer.view.style.top = '0'
   app.renderer.view.style.left = '0'
-  sprites = app.stage.children;
+
+  snakeContainer = new PIXI.Container();
+  foodContainer = new PIXI.Container();
+  app.stage.addChild(snakeContainer);
+  app.stage.addChild(foodContainer);
+  snake = snakeContainer.children;
+  food = foodContainer.children;
 
   app.loader
-    .add([snake, food])
+    .add([snakePng, foodPng])
     .on('progress', loadProgressHandler)
     .load(() => {
       createIdTexture();
