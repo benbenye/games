@@ -108,11 +108,11 @@ function play() {
 }
 
 function moveForward(noHead) {
-  for (let i = sprites.length - 1; i > 0; i--) {
-    sprites[i].x = sprites[i-1].x;
-    sprites[i].y = sprites[i-1].y;
-    sprites[i].vx = sprites[i-1].vx;
-    sprites[i].vy = sprites[i-1].vy;
+  for (let i = snake.length - 1; i > 0; i--) {
+    snake[i].x = snake[i-1].x;
+    snake[i].y = snake[i-1].y;
+    snake[i].vx = snake[i-1].vx;
+    snake[i].vy = snake[i-1].vy;
   }
   if (!noHead) {
     head.x += head.vx;
@@ -129,11 +129,12 @@ function pause() {
 }
 
 function createIdTexture () {
-  game.texture = PIXI.Texture.from(snake);
+  game.snakeTexture = PIXI.Texture.from(snakePng);
+  game.foodTexture = PIXI.Texture.from(foodPng);
 }
 
 function setupSprite ({x, y, v}) {
-  let sprite2 = new PIXI.Sprite(game.texture);
+  let sprite2 = new PIXI.Sprite(game.snakeTexture);
   sprite2.x = strip(x * game.spriteWidth);
   sprite2.y = strip(y * game.spriteWidth);
   sprite2.vx = v.vx;
