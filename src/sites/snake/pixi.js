@@ -71,8 +71,6 @@ function loadProgressHandler (loader, resources) {
 
 function gameStart () {
   initSnake();
-  console.log(app)
-  console.log(game)
 }
 
 function play() {
