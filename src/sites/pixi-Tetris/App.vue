@@ -13,8 +13,9 @@
         <li v-for="(t, index) in 200" :key="index"></li>
       </ul>
       <div id="tetris"></div>
+      <div id="t1"></div>
     </div>
-    <game-over v-show="data.isGameOver"></game-over>
+    <game-over v-show="game.isGameOver" @restart="restart"></game-over>
 
     <div class="control">
       <div class="btn up" @click="up">↑</div>
@@ -29,8 +30,8 @@
 </template>
 
 <script>
-import pixi from './pixi';
-import data from './pixi-store';
+import createGame from './game/index';
+import {initStore} from './pixi-store';
 import GameOver from './components/gameover.vue';
 
 export default {
@@ -38,34 +39,37 @@ export default {
   components: {GameOver},
   data() {
     return {
-      data,
-      pixi
+      game: {}
     }
   },
   mounted() {
-    pixi.app();
+    this.game = createGame(window.devicePixelRatio, initStore('t1', 500));
+    this.start();
   },
   methods: {
+    start() {
+      this.game.start();
+    },
     restart() {
-      pixi.app();
+      this.game.restart();
     },
     pause() {
-      pixi.pause();
+      this.game.pause();
     },
     guide() {
-      this.data.guide = !this.data.guide;
+      this.game.guide = !this.game.guide;
     },
     up() {
-      pixi.movingContainer.up();
+      this.game.up();
     },
     left() {
-      pixi.movingContainer.left();
+      this.game.left();
     },
     right() {
-      pixi.movingContainer.right();
+      this.game.right();
     },
     down() {
-      pixi.movingContainer.down();
+      this.game.down();
     }
   }
 };
@@ -127,16 +131,11 @@ export default {
     }
   }
   .box {
-    width: 90%;
+    width: px2rem(500);
     margin: px2rem(50) auto;
     border-radius: px2rem(40);
     text-align: center;
     position: relative;
-    #tetris {
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
   }
     .control {
       text-align: right;

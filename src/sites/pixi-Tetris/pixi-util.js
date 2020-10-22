@@ -1,4 +1,6 @@
-export function keyboard(keyCode) {
+import * as PIXI from 'pixi.js'
+
+export const keyboard = (keyCode) => {
   let key = {};
   key.code = keyCode;
   key.release = undefined;
@@ -16,15 +18,15 @@ export function keyboard(keyCode) {
   return key;
 }
 
-export function randomInt(min, max) {
+export const randomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function strip(num, precision = 12) {
+export const strip = (num, precision = 12) => {
   return +parseFloat(num.toPrecision(precision));
 }
 
-export function hitTestRectangle(r1, r2, direction) {
+export const hitTestRectangle = (r1, r2, direction) => {
   if (direction === 'down') {
     return Math.abs(r2.y + r2.height - r1.y) <= 2;
   }
@@ -35,3 +37,22 @@ export function hitTestRectangle(r1, r2, direction) {
     return Math.abs(r2.x + r2.width - r1.x) <= 2;
   }
 };
+
+export const movingContainerToStaticContainer = (movingContainer, staticContainer) => {
+    while(movingContainer.children[0]) {
+    let sprite = movingContainer.children[0];
+    sprite.y += movingContainer.y;
+    sprite.x += movingContainer.x;
+    sprite.tint = 0xFFFFFF;
+    staticContainer.addChild(sprite);
+  }
+}
+
+export const setupSprite = ({x, y, texture, spriteWidth}) => {
+  const sprite = new PIXI.Sprite(texture);
+  sprite.x = strip(x);
+  sprite.y = strip(y);
+  sprite.width = spriteWidth;
+  sprite.height = spriteWidth;
+  return sprite;
+}

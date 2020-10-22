@@ -1,16 +1,8 @@
-import _ from 'lodash';
-
-let data = {};
-initStore();
-
-export function initStore() {
-  data.boxId = 'tetris-bg';
-  data.docId = 'tetris';
-  data.delay = 1000;
-  data.currentScore = 0;
-  data.highestScore = 0;
-  data.isGameOver = false;
-  data.guide = true;
+export const initStore = (docId = 'tetris', delay = 500) => {
+  return {
+    docId,
+    delay,
+    currentScore: 0,
+    highestScore: 0,
+  };
 }
-
-export default data;

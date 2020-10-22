@@ -6,8 +6,6 @@
 </template>
 
 <script>
-import pixi from '../pixi';
-import data from '../pixi-store';
 
 export default {
   name: 'GameOver',
@@ -15,7 +13,7 @@ export default {
   },
   methods: {
     newGame() {
-      pixi.app();
+      this.$emit('restart');
     }
   }
 };

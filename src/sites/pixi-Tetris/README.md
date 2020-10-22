@@ -56,6 +56,20 @@ function getSpritesInCoordinate(coo) {
 ### 3. Remove child from array
 I made the same mistakes twice. Remove a child from array with forEach in previous, I made this mistake in the game [`2048`](https://5hez.github.io/games/2048/).    
 
+### 4. fix bug
+之前在左右移动的时候，如果方块两侧都有物体需要检测时候，会出现漏洞。
+因为在检测的时候忘了考虑不需要检测的方块了。
+    
+```
+      const movingBlock = movingHitSprites.find(s => Math.abs(s.y + cy - t.y) < 2);
+      if (movingBlock) {
+        if (direction === 'left'){
+          return t.x <= movingBlock.x + cx;
+        } else {
+          return t.x >= movingBlock.x + cx;
+        }
+      }
+```
 
 ### References
  - [Tetris rotate rule](https://vignette.wikia.nocookie.net/tetrisconcept/images/3/3d/SRS-pieces.png/revision/latest?cb=20060626173148)   
