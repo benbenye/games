@@ -15,7 +15,7 @@
 ### demo gif
 <img src="https://mmbiz.qpic.cn/mmbiz_gif/07qFzkU6Kn4HNFXI0KTiaCMZkian3MWgvgr3yUdYDlcHloF2WlZqFVfk7cVVxSicibTibBAgicOS06nuEezgT3hU5ZVg/640?wx_fmt=gif&tp=webp&wxfrom=5&wx_lazy=1" width="230" alt="Snake">
 
-## 4: 大西瓜
+## 4: [合成大西瓜 cocos creator3.0](https://github.com/benbenye/daxigua)
 ## 5: [cut buttons](https://github.com/benbenye/buttonCut)
 
 ## 6: [斗兽棋](https://github.com/benbenye/Jungle)
