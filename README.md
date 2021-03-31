@@ -1,7 +1,7 @@
 # games
 益智游戏合辑
 
-## 1: [2048 dom & jQ](https://github.com/benbenye/2048)  [2048 Pixi.js & vue.js](https://github.com/benbenye/2048/tree/pixi.js)  [2048 cocos creator 3.0](https://github.com/benbenye/2048/tree/cocos3.0-sensor)  
+## 1: [2048 dom & jQ](https://github.com/benbenye/2048),  [2048 Pixi.js & vue.js](https://github.com/benbenye/2048/tree/pixi.js),  [2048 cocos creator 3.0](https://github.com/benbenye/2048/tree/cocos3.0-sensor)  
 ## 2: [Tetris](https://github.com/benbenye/games/tree/master/src/sites/pixi-Tetris) 
 
 ## 2: [Snake](https://github.com/benbenye/games/tree/master/src/sites/snake) 
