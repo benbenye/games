@@ -19,5 +19,5 @@
 ## 5: [cut buttons](https://github.com/benbenye/buttonCut)
 
 ## 6: [斗兽棋](https://github.com/benbenye/Jungle)
-## 7: [屋顶棍棍侠]()
+## 7: [屋顶棍棍侠](https://github.com/benbenye/gungunxia)
 ## 8: [物品分类大师](https://github.com/benbenye/sortKing)
