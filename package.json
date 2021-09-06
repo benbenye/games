@@ -43,7 +43,7 @@
     "sass-loader": "^7.1.0",
     "should": "^13.2.3",
     "should-sinon": "0.0.6",
-    "standard-version": "^4.4.0",
+    "standard-version": "^8.0.1",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "vue-template-compiler": "^2.6.10"
